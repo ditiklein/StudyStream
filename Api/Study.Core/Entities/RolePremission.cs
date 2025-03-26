@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace Study.Core.Entities
 {
    public class RolePremission
     {
+        [Key]
         public int Id { get; set; }
         
         public int RoleId { get; set; }

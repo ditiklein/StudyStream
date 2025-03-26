@@ -119,6 +119,7 @@ const Login = () => {
                   textShadow: '0 0 15px rgba(255,255,255,0.7), 0 0 30px rgba(255,255,255,0.5)',
                   WebkitTextStroke: '2px white', 
                   mb: 4,
+                  direction:'rtl',
                   lineHeight: 1.1,
                   fontSize: {
                     xs: '2.5rem',  // Smaller screens

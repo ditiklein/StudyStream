@@ -18,6 +18,7 @@ using OpenAI;
 using OpenAI.Managers;
 using Microsoft.AspNetCore.SignalR;
 using DotNetEnv;
+using Microsoft.EntityFrameworkCore;
 Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,7 +71,6 @@ builder.Services.AddSingleton<IAmazonS3>(serviceProvider =>
 });
 
 
-builder.Services.AddDbContext<DataContext>();
 builder.Services.AddAutoMapper(typeof(MappingProfile), typeof(MappingProfilePost));
 
 // הגדרת Authentication
@@ -119,6 +119,11 @@ builder.Services.AddCors(options =>
 });
 
 
+var connectionString = "Server=byo3p4s57fzedf1iyboh-mysql.services.clever-cloud.com;Port=3306;Database=byo3p4s57fzedf1iyboh;User=ut4tbtgcqt9icjzh;Password=9bDF0LYJtL7wFUQSeyrV";
+builder.Services.AddDbContext<DataContext>(options =>
+{
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+});
 
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
