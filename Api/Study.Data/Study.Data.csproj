@@ -12,7 +12,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Zack.EFCore.Batch.MySQL.Pomelo_NET6" Version="6.1.9" />
+    <PackageReference Include="Zack.EFCore.Batch.MySQL.Pomelo_NET6" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
