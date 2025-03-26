@@ -27,4 +27,3 @@ public class TranscriptionHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 }
-////fghf
