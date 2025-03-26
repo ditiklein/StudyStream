@@ -68,13 +68,13 @@ export const FileOverlay = styled(Box)({
 });
 
 // אייקון ההורדה עם עיצוב
-export const DownloadIconStyled = styled(DownloadIcon)(({ theme }) => ({
+export const DownloadIconStyled = styled(DownloadIcon)(() => ({
   fontSize: 40,
   color: 'white',
 }));
 
 // עיצוב לשם הפריט (תיקייה/קובץ)
-export const ItemName = styled(Typography)(({ theme }) => ({
+export const ItemName = styled(Typography)(() => ({
   textAlign: 'center',
   overflow: 'hidden',
   textOverflow: 'ellipsis',

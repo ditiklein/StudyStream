@@ -1,8 +1,6 @@
 import axios, { AxiosProgressEvent } from "axios";
-import { AppDispatch, Rootstore } from "./FileAndFolderStore/FileStore";
+import { AppDispatch } from "./FileAndFolderStore/FileStore";
 import { addFile } from "./FileAndFolderStore/FilesSlice";
-import { useSelector } from "react-redux";
-import User from "../Modles/User";
 
 export const handleConfirmation = async (
   files: File[],

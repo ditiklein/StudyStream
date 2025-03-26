@@ -1,12 +1,11 @@
-import React from 'react'; 
-import { AppBar, Toolbar, Button, Box, Container, useMediaQuery, useTheme, Avatar } from '@mui/material'; 
+import { AppBar, Toolbar, Button, Box, Container} from '@mui/material'; 
 import { Link, Outlet, useNavigate } from 'react-router-dom'; 
 import { NameAvatar } from '../Auth/Avatar';  
 
 const Layout = () => {   
-  const theme = useTheme();   
+  // const theme = useTheme();   
   const navigate = useNavigate();   
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));      
+  // const isMobile = useMediaQuery(theme.breakpoints.down('md'));      
 
   // Get user from session storage   
   const user = JSON.parse(sessionStorage.getItem('User') || 'null');    

@@ -5,7 +5,7 @@ import {
   Grid, 
   Card, 
   CardContent,
-  useTheme
+  // useTheme
 } from '@mui/material';
 import MicNoneOutlinedIcon from '@mui/icons-material/MicNoneOutlined';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
@@ -15,7 +15,7 @@ import TrendingUpOutlinedIcon from '@mui/icons-material/TrendingUpOutlined';
 import CloudOutlinedIcon from '@mui/icons-material/CloudOutlined';
 
 function Features() {
-  const theme = useTheme();
+  // const theme = useTheme();
   
   const features = [
     {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
@@ -8,8 +8,8 @@ import {
   Alert
 } from '@mui/material';
 import { 
-  Download as DownloadIcon,
-  Save as SaveIcon,
+  // Download as DownloadIcon,
+  // Save as SaveIcon,
   Mic as MicIcon
 } from '@mui/icons-material';
 import * as signalR from '@microsoft/signalr';
@@ -25,8 +25,8 @@ interface TranscriptionViewerProps {
 }
 
 const TranscriptionViewer: React.FC<TranscriptionViewerProps> = ({ selectedLesson }) => {
-  const [transcriptionText, setTranscriptionText] = useState<string>('');
-  const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+  const [_transcriptionText, setTranscriptionText] = useState<string>('');
+  const [_connection, setConnection] = useState<signalR.HubConnection | null>(null);
   const [connectionId, setConnectionId] = useState<string | null>(null);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');

@@ -1,11 +1,11 @@
-import { Box, Container, Typography, Button, Grid, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Container, Typography, Button, Grid } from "@mui/material";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import ImageCarousel from "./Imagecorsol";
 import { Link } from 'react-router-dom';
 
 function Hero() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  // const theme = useTheme();
+  // const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   return (
     <Box

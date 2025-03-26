@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
 
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, CircularProgress 
 } from '@mui/material';
-import { AppDispatch, Rootstore } from '../FileAndFolderStore/FileStore';
+import { AppDispatch } from '../FileAndFolderStore/FileStore';
 import { addFolder, selectFoldersAndFiles } from '../FileAndFolderStore/FilesSlice';
-import User from '../../Modles/User';
 
 interface NewFolderDialogProps {
   open: boolean;
@@ -25,7 +24,7 @@ const NewFolderDialog: React.FC<NewFolderDialogProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const [folderName, setFolderName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorr, setError] = useState('');
+  const [_errorr, setError] = useState('');
   const storedUser = sessionStorage.getItem('User');
   const user = storedUser ? JSON.parse(storedUser) : null;
     const { folders, error } = useSelector(selectFoldersAndFiles);

@@ -1,12 +1,9 @@
 import { useRef, useState } from "react";
 import { Box, Typography } from "@mui/material";
-import axios, { AxiosProgressEvent } from "axios";
 import { UploadBox, UploadButton } from "./UploadBox";
 import FileDialog from "./FileDialog";
-import { useDispatch, useSelector } from "react-redux";
-import { addFile } from "../FileAndFolderStore/FilesSlice";
-import { AppDispatch, Rootstore } from "../FileAndFolderStore/FileStore";
-import User from "../../Modles/User";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../FileAndFolderStore/FileStore";
 import { handleConfirmation } from "../Confirmation";
 
 interface Id {
@@ -20,8 +17,8 @@ export const FileUploadSystem: React.FC<Id> = ({ parentId }) => {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const dispatch = useDispatch<AppDispatch>();
-  const storedUser = sessionStorage.getItem('User');
-  const user = storedUser ? JSON.parse(storedUser) : null;
+  // const storedUser = sessionStorage.getItem('User');
+  // const user = storedUser ? JSON.parse(storedUser) : null;
   
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();

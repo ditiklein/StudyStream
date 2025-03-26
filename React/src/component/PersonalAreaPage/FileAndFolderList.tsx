@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Typography, CircularProgress, Grid, TextField, IconButton } from '@mui/material';
 import { fetchRootFolders, fetchSubFoldersAndFiles, selectFoldersAndFiles, updateFile, updateFolder } from '../FileAndFolderStore/FilesSlice';
@@ -32,8 +32,8 @@ const FolderAndFileList: React.FC<FolderAndFileListProps> = ({
   const storedUser = sessionStorage.getItem('User');
 const user = storedUser ? JSON.parse(storedUser) : null;
 
-  const [hoverFolderId, setHoverFolderId] = useState<number | null>(null);
-  const [hoverFileId, setHoverFileId] = useState<number | null>(null);
+  const [_hoverFolderId, setHoverFolderId] = useState<number | null>(null);
+  const [_hoverFileId, setHoverFileId] = useState<number | null>(null);
   const [editingFolderId, setEditingFolderId] = useState<number | null>(null);
   const [newFolderName, setNewFolderName] = useState<string>('');
   const [editingFileId, setEditingFileId] = useState<number | null>(null);

@@ -143,7 +143,7 @@ export const deleteFolder = createAsyncThunk(
   "folders/deleteFolder",
   async (id: number, thunkAPI) => {
     try {
-      const response = await axios.delete(`https://localhost:7147/api/Folder/${id}`);
+      await axios.delete(`https://localhost:7147/api/Folder/${id}`);
       return { id }; // מחזירים את ה-ID של התיקייה שנמחקה
     } catch (error) {
       const err = error as AxiosError;
@@ -180,7 +180,7 @@ export const deleteFile = createAsyncThunk(
   "files/deleteFile",
   async (id: number, thunkAPI) => {
     try {
-      const response = await axios.delete(`https://localhost:7147/api/Lesson/${id}`);
+  await axios.delete(`https://localhost:7147/api/Lesson/${id}`);
       return { id }; // מחזירים את ה-ID של הקובץ שנמחק
     } catch (error) {
       const err = error as AxiosError;

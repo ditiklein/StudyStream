@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Container, Typography, Breadcrumbs, Link, Paper, Button, DialogContent, Dialog } from '@mui/material';
+import  { useState } from 'react';
+import { Box, Container, Typography, Breadcrumbs, Link, Paper, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -34,8 +34,8 @@ const ActionButton = styled(Button)(({ theme }) => ({
 
 const FileManager: React.FC = () => {
   const [newFolderOpen, setNewFolderOpen] = useState(false);
-  const [uploadFileOpen, setUploadFileOpen] = useState(false);
-  const [recordingModalOpen, setRecordingModalOpen] = useState(false); // מצב עבור מודל ההקלטה
+  const [_uploadFileOpen, setUploadFileOpen] = useState(false);
+  const [_recordingModalOpen, setRecordingModalOpen] = useState(false); // מצב עבור מודל ההקלטה
   const [breadcrumbs, setBreadcrumbs] = useState<{ id: number | null; name: string }[]>([
     { id: null, name: 'הקבצים שלי' },
   ]);

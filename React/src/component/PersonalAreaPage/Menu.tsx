@@ -38,7 +38,8 @@ export default function LongMenu({ id, onEdit,folder,currentFolder}: LongMenuPro
     setAnchorEl(null);
   };
   const handleMove = (event: React.MouseEvent) => {
-    
+    event.stopPropagation();
+
     handleClose();
     setOpenTransferDialog(true); // פותח את הדיאלוג של העברת הקובץ
 
