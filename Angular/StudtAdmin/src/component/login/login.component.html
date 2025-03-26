@@ -1,0 +1,53 @@
+<div class="split-container">
+  <!-- Image Section -->
+  <div class="image-section">
+    <img src="/14.jpg" alt="FolioTeach Background" class="background-image">
+    <div class="overlay">
+      <div class="logo-container">
+        <mat-icon>school</mat-icon>
+        <span>FolioTeach</span>
+      </div>
+      <h2>ברוכים הבאים לפלטפורמת FolioTeach</h2>
+      <p>המקום המושלם למורים להתחבר ולנהל את התיק המקצועי שלהם</p>
+    </div>
+  </div>
+
+  <!-- Login Section -->
+  <div class="login-section">
+    <div class="login-card-container">
+      <mat-card class="login-card">
+        <div class="login-header">
+          <h1>התחברות</h1>
+          <p>הקלד את המייל שלך והסיסמא כדי להתחבר</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+          <mat-form-field appearance="fill"> 
+            <input matInput formControlName="email" placeholder="הזן את כתובת המייל שלך" type="email" required>
+            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">אימייל נדרש</mat-error>
+            <mat-error *ngIf="loginForm.get('email')?.hasError('email')">נא להזין מייל תקין</mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="fill"> 
+            <input matInput formControlName="password" placeholder="הזן את הסיסמה שלך" [type]="hide ? 'password' : 'text'" required>
+
+            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">סיסמה נדרשת</mat-error>
+          </mat-form-field>
+          
+
+          <div class="form-options">
+            <mat-checkbox formControlName="rememberMe" color="primary">זכור אותי</mat-checkbox>
+            <a href="#" class="forgot-password">שכחת סיסמא?</a>
+          </div>
+
+          <button mat-flat-button color="primary" type="submit" class="login-button" [disabled]="!loginForm.valid">
+            התחברות
+            <mat-icon>login</mat-icon>
+          </button>
+
+         
+        </form>
+      </mat-card>
+    </div>
+  </div>
+</div>

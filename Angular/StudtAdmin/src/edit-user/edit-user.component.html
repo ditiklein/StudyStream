@@ -1,0 +1,41 @@
+<div class="body">
+    <div class="form-container">
+      <h2>Edit User</h2>
+      <form [formGroup]="userForm">
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>First Name</mat-label>
+          <input matInput formControlName="firstName" placeholder="Enter first name">
+          <mat-icon matPrefix>school</mat-icon>
+        </mat-form-field>
+  
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Last Name</mat-label>
+          <input matInput formControlName="lastName" placeholder="Enter last name">
+          <mat-icon matPrefix>school</mat-icon>
+        </mat-form-field>
+  
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" placeholder="Enter password" type="password">
+          <mat-icon matPrefix>lock</mat-icon>
+        </mat-form-field>
+  
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" placeholder="Enter email" type="email">
+          <mat-icon matPrefix>email</mat-icon>
+        </mat-form-field>
+  
+        <div class="button-container">
+          <button mat-raised-button class="black-button" (click)="save()" [disabled]="!userForm.valid">
+            <mat-icon>save</mat-icon> Save
+          </button>
+          <button mat-raised-button class="cancel-button" (click)="close()">
+            <mat-icon>cancel</mat-icon> Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
