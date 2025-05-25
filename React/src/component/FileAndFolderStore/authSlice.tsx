@@ -221,15 +221,24 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(login.fulfilled, (state, action: PayloadAction<{ token: string; user: User }>) => {
-        state.loading = false;
-        state.token = action.payload.token;
-        state.user = action.payload.user;
-        
-        // שמירה ב-sessionStorage
-        sessionStorage.setItem('token', action.payload.token);
-        sessionStorage.setItem('User', JSON.stringify(action.payload.user));
-      })
+.addCase(login.fulfilled, (state, action: PayloadAction<{ token: string; user: User }>) => {
+  console.log('=== LOGIN FULFILLED ===');
+  console.log('Action payload:', action.payload);
+  console.log('Token:', action.payload.token);
+  console.log('User:', action.payload.user);
+  
+  state.loading = false;
+  state.token = action.payload.token;
+  state.user = action.payload.user;
+  
+  // שמירה ב-sessionStorage
+  console.log('Saving to sessionStorage...');
+  sessionStorage.setItem('token', action.payload.token);
+  sessionStorage.setItem('User', JSON.stringify(action.payload.user));
+  
+  console.log('Saved token:', sessionStorage.getItem('token'));
+  console.log('Saved user:', sessionStorage.getItem('User'));
+})
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
       
