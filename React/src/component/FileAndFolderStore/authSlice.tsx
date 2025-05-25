@@ -3,6 +3,8 @@ import { Rootstore } from "./FileStore";
 import User from "../../Modles/User";
 import api from "./Api";
 
+
+
 interface AuthState {
   token: string | null;
   user: User ;
@@ -11,6 +13,17 @@ interface AuthState {
 }
 const storedToken = sessionStorage.getItem('token');
 const storedUser = sessionStorage.getItem('User');
+
+let parsedUser: User | null = null;
+if (storedUser && storedUser !== "undefined") {
+  try {
+    parsedUser = JSON.parse(storedUser);
+  } catch (e) {
+    console.error("שגיאה בניסיון לקרוא את storedUser:", e);
+    parsedUser = null;
+  }
+}
+
 
 const initialState: AuthState = {
   token: storedToken ? (storedToken) : null,
@@ -25,6 +38,7 @@ export const login = createAsyncThunk(
   async (credentials: { email: string; password: string }, thunkAPI) => {
     try {
       console.log(credentials);
+      console.log(api);
       
       const response = await api.post<{ token: string; user: User }>("/Auth/login", credentials);
       return response.data;
