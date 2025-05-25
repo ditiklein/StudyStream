@@ -235,8 +235,7 @@ const Login = () => {
                   {/* קישור להרשמה */}
                   <Box sx={{ textAlign: 'center' }}>
                     <Typography variant="body2" sx={{ color: 'white' }}>
-                      אין לך חשבון?{' '}
-                      <Link
+                       <Link
                         component="button"
                         type="button"
                         onClick={handleRegisterClick}
@@ -253,6 +252,8 @@ const Login = () => {
                       >
                         הירשם עכשיו
                       </Link>
+                    {'  '}  ?אין לך חשבון{' '}
+                     
                     </Typography>
                   </Box>
 

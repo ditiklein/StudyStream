@@ -1,6 +1,6 @@
 import  { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, TextField,Typography,Container, CircularProgress,FormHelperText,Paper,Grid,InputAdornment
+import { Box, Button, TextField,Typography,Container, CircularProgress,FormHelperText,Paper,Grid,InputAdornment, Link
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -115,14 +115,19 @@ const Register = () => {
     }
   };
 
+  const handleLoginClick = () => {
+    navigate("/login");
+  };
+
   return (
     <Box sx={{ 
-      minHeight: '100vh', 
+      height: '100vh', 
       display: 'flex', 
       flexDirection: 'column',
-      direction: 'rtl' 
+      direction: 'rtl',
+      overflow: 'hidden'
     }}>
-      <Grid container sx={{ minHeight: '100vh' }}>
+      <Grid container sx={{ height: '100vh' }}>
         {/* תמונה בצד שמאל */}
         <Grid item xs={12} md={6} sx={{
           backgroundImage: 'url(/d.jpg)',
@@ -238,7 +243,7 @@ const Register = () => {
                     margin="dense"  
                     value={newUser.password} 
                     onChange={handleChange}  
-                    sx={{ mb: 2 }} 
+                    sx={{ mb: 1 }} 
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -250,7 +255,7 @@ const Register = () => {
                   />
                   
                   {(formError || error) && (
-                    <FormHelperText error sx={{ mb: 2, color: '#ffcdd2' }}>
+                    <FormHelperText error sx={{ mb: 1, color: '#ffcdd2' }}>
                       {formError || getErrorMessage(error)}
                     </FormHelperText>
                   )}
@@ -263,6 +268,7 @@ const Register = () => {
                     sx={{   
                       bgcolor: pinkColor, 
                       py: 1.5, 
+                      mb: 2,
                       '&:hover': { 
                         bgcolor: '#E03070' 
                       } 
@@ -270,6 +276,32 @@ const Register = () => {
                   >
                     {loading ? <CircularProgress size={24} color="inherit" /> : 'הרשמה'}
                   </Button>
+
+                  {/* קישור להתחברות */}
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="body2" sx={{ color: 'white' }}>
+                                             <Link
+                        component="button"
+                        type="button"
+                        onClick={handleLoginClick}
+                        sx={{
+                          color: 'white',
+                          textDecoration: 'underline',
+                          fontSize: 'inherit',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            color: '#E3F2FD',
+                            textDecoration: 'underline'
+                          }
+                        }}
+                      >
+                        הכנס עכשיו
+                      </Link>
+
+                     {'  ' }?אתה מחובר{' '}
+                    </Typography>
+                  </Box>
+
                 </form>
               </Paper>
             </Box>
