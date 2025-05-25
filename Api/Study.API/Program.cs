@@ -114,7 +114,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
         policy.WithOrigins("http://localhost:5174" +
-        "", "http://localhost:4200", "http://localhost:51306") // ‡Â ‰Œfrontend ˘ÏÍ
+        "", "http://localhost:4200", "https://studystream-rgv5.onrender.com") // ‡Â ‰Œfrontend ˘ÏÍ
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials()
