@@ -16,7 +16,6 @@ import {
   RestoreFromTrash as RestoreIcon, 
   MicNone as MicIcon 
 } from '@mui/icons-material';
-import axios from 'axios';
 import { keyframes } from '@emotion/react';
 import { fetchRootFolders, fetchSubFoldersAndFiles, hardDeleteFile, updateFile } from '../FileAndFolderStore/FilesSlice';
 import { useDispatch } from 'react-redux';
@@ -55,7 +54,7 @@ const RecycleBinDialog: React.FC<RecycleBinDialogProps> = ({
     if (!user) return; // אם אין משתמש, אין צורך להמשיך
 
     try {
-      const response = await axios.get(`http://localhost:5220/api/Lesson/deleted/${user.id}`);
+const response = await api.get(`/api/Lesson/deleted/${user.id}`);
       if (response.data) {
         setRecordings(response.data);
       }

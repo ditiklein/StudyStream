@@ -1,5 +1,6 @@
 import  { useState } from 'react';
 import axios from 'axios';
+import api from './FileAndFolderStore/Api';
 
 const FileUploader = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -16,7 +17,7 @@ const FileUploader = () => {
 
     try {
       // שלב 1: קבלת Presigned URL מהשרת
-      const response = await axios.get('https://localhost:7147/api/upload/presigned-url', {
+      const response = await api.get('/upload/presigned-url', {
         params: { fileName: file.name }
       });
 

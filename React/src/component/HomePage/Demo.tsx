@@ -27,6 +27,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import { useDispatch, useSelector } from 'react-redux';
 import { extractKeyPoints, selectKeyPoints, summarizeLesson } from '../FileAndFolderStore/KeyPointsSlice';
 import Swal from 'sweetalert2';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // ממשק עבור תכונות צעד בהדגמה
 interface DemoStepProps {
@@ -294,7 +295,7 @@ const Demo: React.FC = () => {
       const formData = new FormData();
       formData.append("file", file);
       
-      const response = await fetch("http://localhost:5220/api/transcription/transcribe-full", {
+      const response = await fetch(`${apiUrl}/transcription/transcribe-full`, {
         method: "POST",
         body: formData,
       });
