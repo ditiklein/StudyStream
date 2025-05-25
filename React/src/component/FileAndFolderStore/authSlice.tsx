@@ -23,6 +23,8 @@ if (storedUser && storedUser !== "undefined") {
     parsedUser = null;
   }
 }
+console.log(parsedUser);
+
 
 
 const initialState: AuthState = {
