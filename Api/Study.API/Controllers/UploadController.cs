@@ -16,19 +16,58 @@ public class UploadController : ControllerBase
         _s3Client = s3Client;
     }
 
-    [HttpGet("presigned-url")]
-    public async Task<IActionResult> GetPresignedUrl([FromQuery] string fileName)
-    {
+    //[HttpGet("presigned-url")]
+    //public async Task<IActionResult> GetPresignedUrl([FromQuery] string fileName)
+    //{
 
+    //    var extension = Path.GetExtension(fileName).ToLower();
+
+    //    // אם הסיומת לא ברשימה, החזרת שגיאה
+    //    if (!_allowedExtensions.Contains(extension))
+    //    {
+    //        return BadRequest("Only audio files are allowed (.mp3, .wav, .ogg, .aac, .flac, .txt, .json)");
+    //    }
+
+    //    string contentType = extension switch
+    //    {
+    //        ".mp3" => "audio/mpeg",
+    //        ".wav" => "audio/wav",
+    //        ".ogg" => "audio/ogg",
+    //        ".aac" => "audio/aac",
+    //        ".flac" => "audio/flac",
+    //        ".txt" => "text/plain",
+    //        ".json" => "application/json",
+    //        _ => "application/octet-stream" // ברירת מחדל (לא אמור לקרות בגלל הבדיקה)
+    //    };
+
+    //    var request = new GetPreSignedUrlRequest
+    //    {
+    //        BucketName = "studystream",
+    //        Key = fileName,
+    //        Verb = HttpVerb.PUT,
+    //        Expires = DateTime.UtcNow.AddMinutes(5),
+    //        ContentType = contentType
+    //    };
+
+    //    string url = _s3Client.GetPreSignedURL(request);
+    //    return Ok(new { url });
+    //}
+
+    [HttpGet("presigned-url")]
+    public async Task<IActionResult> GetPresignedUrl(
+    [FromQuery] string fileName,
+    [FromQuery] string contentType = null) // הוסף פרמטר
+    {
         var extension = Path.GetExtension(fileName).ToLower();
 
-        // אם הסיומת לא ברשימה, החזרת שגיאה
+        // בדיקת הרשאה
         if (!_allowedExtensions.Contains(extension))
         {
             return BadRequest("Only audio files are allowed (.mp3, .wav, .ogg, .aac, .flac, .txt, .json)");
         }
 
-        string contentType = extension switch
+        // אם לא נשלח contentType, השתמש בברירת מחדל לפי הסיומת
+        string finalContentType = contentType ?? extension switch
         {
             ".mp3" => "audio/mpeg",
             ".wav" => "audio/wav",
@@ -37,8 +76,14 @@ public class UploadController : ControllerBase
             ".flac" => "audio/flac",
             ".txt" => "text/plain",
             ".json" => "application/json",
-            _ => "application/octet-stream" // ברירת מחדל (לא אמור לקרות בגלל הבדיקה)
+            _ => "application/octet-stream"
         };
+
+        // הדפס debug info
+        Console.WriteLine($"🔍 Presigned URL Request:");
+        Console.WriteLine($"   - fileName: '{fileName}'");
+        Console.WriteLine($"   - requested contentType: '{contentType}'");
+        Console.WriteLine($"   - final contentType: '{finalContentType}'");
 
         var request = new GetPreSignedUrlRequest
         {
@@ -46,12 +91,16 @@ public class UploadController : ControllerBase
             Key = fileName,
             Verb = HttpVerb.PUT,
             Expires = DateTime.UtcNow.AddMinutes(5),
-            ContentType = contentType
+            ContentType = finalContentType // השתמש בערך הסופי
         };
 
         string url = _s3Client.GetPreSignedURL(request);
+
+        Console.WriteLine($"✅ Generated presigned URL with ContentType: {finalContentType}");
+
         return Ok(new { url });
     }
+
     [HttpGet("download-url/{fileName}")]
     
     public async Task<string> GetDownloadUrlAsync(string fileName)

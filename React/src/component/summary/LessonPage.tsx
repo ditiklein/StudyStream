@@ -228,7 +228,7 @@ const LessonsPage = () => {
                     <CardContent sx={{ flexGrow: 1 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, backgroundColor: '#4361ee15', p: 1.5, borderRadius: 2, borderLeft: '4px solid #4361ee' }}>
                         <EventNoteIcon sx={{ mr: 1, color: '#4361ee' }} />
-                        <Typography variant="h6" fontWeight="bold" sx={{ color: '#1a237e' }}>{lesson.lessonName}</Typography>
+                        <Typography variant="h6" fontWeight="bold" sx={{ color: '#1a237e' }}>{lesson.lessonName.split('.').slice(0, -1).join('.')}</Typography>
                       </Box>
                       <Divider sx={{ mb: 2 }} />
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>

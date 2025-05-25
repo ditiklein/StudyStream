@@ -54,7 +54,7 @@ const RecycleBinDialog: React.FC<RecycleBinDialogProps> = ({
     if (!user) return; // אם אין משתמש, אין צורך להמשיך
 
     try {
-const response = await api.get(`/api/Lesson/deleted/${user.id}`);
+const response = await api.get(`/Lesson/deleted/${user.id}`);
       if (response.data) {
         setRecordings(response.data);
       }
@@ -77,7 +77,7 @@ const response = await api.get(`/api/Lesson/deleted/${user.id}`);
       await dispatch(updateFile({
         id: file.id, 
         lessonName: file.lessonName,
-        folderId: currentFolderId, 
+        folderId: file.folderId, 
         ownerId: user.id,
         fileType: file.fileType, 
         url: file.url,

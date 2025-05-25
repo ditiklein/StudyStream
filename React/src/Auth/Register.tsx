@@ -1,16 +1,6 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  Box, 
-  Button, 
-  TextField, 
-  Typography, 
-  Container, 
-  CircularProgress,
-  FormHelperText,
-  Paper,
-  Grid,
-  InputAdornment
+import { Box, Button, TextField,Typography,Container, CircularProgress,FormHelperText,Paper,Grid,InputAdornment
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -55,7 +45,7 @@ const StyledTextField = styled(TextField)({
 
 const Register = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { token, loading, error } = useSelector((state: Rootstore) => state.auth);
+  const {  loading, error } = useSelector((state: Rootstore) => state.auth);
   const navigate = useNavigate();
 
   const [newUser, setNewUser] = useState({
@@ -76,6 +66,28 @@ const Register = () => {
     setFormError(null);
   };
 
+  // פונקציה לחילוץ מסר השגיאה
+  const getErrorMessage = (error: any): string => {
+    if (typeof error === 'string') {
+      return error;
+    }
+    if (error && typeof error === 'object') {
+      // אם יש response data עם message
+      if (error.response?.data?.message) {
+        return error.response.data.message;
+      }
+      // אם יש message רגיל
+      if (error.message) {
+        return error.message;
+      }
+      // אם זה אובייקט עם מאפיין message אחר
+      if (error.data?.message) {
+        return error.data.message;
+      }
+    }
+    return "אירעה שגיאה לא צפויה";
+  };
+
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -86,12 +98,19 @@ const Register = () => {
 
     try {
       const resultAction = await dispatch(register(newUser));
-      sessionStorage.setItem('token', token || '');
+      console.log("resultAction", resultAction);
+      
       if (register.fulfilled.match(resultAction)) {
+        sessionStorage.setItem('token', resultAction.payload.token || '');
         sessionStorage.setItem('User', JSON.stringify(resultAction.payload.user));
         navigate("/personal");
+      } else {
+        // אם ההרשמה נכשלה
+        const errorMessage = getErrorMessage(resultAction.payload || resultAction.error);
+        setFormError(errorMessage);
       }
     } catch (err) {
+      console.error("Registration error:", err);
       setFormError("שגיאה בהרשמה, אנא נסה שוב.");
     }
   };
@@ -231,8 +250,8 @@ const Register = () => {
                   />
                   
                   {(formError || error) && (
-                    <FormHelperText error sx={{ mb: 2 }}>
-                      {formError || error}
+                    <FormHelperText error sx={{ mb: 2, color: '#ffcdd2' }}>
+                      {formError || getErrorMessage(error)}
                     </FormHelperText>
                   )}
                   
