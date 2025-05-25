@@ -170,36 +170,65 @@ const initialState: AuthState = {
 };
 
 // Async Thunk for Login
+
+// החליפי את login thunk ב-authSlice.ts:
+
 export const login = createAsyncThunk(
   "auth/login",
   async (credentials: { email: string; password: string }, thunkAPI) => {
     try {
-      console.log(credentials);
-      console.log(api);
+      console.log('=== SENDING LOGIN REQUEST ===');
+      console.log('Credentials:', credentials);
+      console.log('API URL:', import.meta.env.VITE_API_URL);
       
-      const response = await api.post<{ token: string; user: User }>("/Auth/login", credentials);
-      return response.data;
+      const response = await api.post("/Auth/login", credentials);
+      
+      console.log('=== RAW SERVER RESPONSE ===');
+      console.log('Full response:', response);
+      console.log('Response data:', response.data);
+      
+      // השרת מחזיר Token ו-User (עם אותיות גדולות)
+      // אבל אנחנו צריכים token ו-user (עם אותיות קטנות)
+      const serverData = response.data;
+      const normalizedData = {
+        token: serverData.Token,    // T גדולה מהשרת → t קטנה
+        user: serverData.User       // U גדולה מהשרת → u קטנה
+      };
+      
+      console.log('=== NORMALIZED DATA ===');
+      console.log('Normalized data:', normalizedData);
+      
+      return normalizedData;
     } catch (error: any) {
-      console.log(error.message);
+      console.log('=== LOGIN ERROR ===');
+      console.log('Error:', error);
+      console.log('Error response:', error.response);
       
       return thunkAPI.rejectWithValue(error.response?.data?.message || "Login failed");
     }
   }
 );
 
-// Async Thunk for Register
+// גם תתקני את register:
 export const register = createAsyncThunk(
   'auth/register',
   async (newUser: {firstName:string,lastName:string,  email: string; password: string; }, thunkAPI) => {
     try {
       const response = await api.post('/Auth/register', {...newUser, roleName: 'User'});
-      return response.data;
+      
+      // השרת מחזיר Token ו-User (עם אותיות גדולות)
+      const serverData = response.data;
+      const normalizedData = {
+        token: serverData.Token,    // T גדולה מהשרת → t קטנה
+        user: serverData.User       // U גדולה מהשרת → u קטנה
+      };
+      
+      return normalizedData;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
   }
 );
-
 const authSlice = createSlice({
   name: "auth",
   initialState,
