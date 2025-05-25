@@ -17,8 +17,13 @@ namespace Study.Core.Interface.IntarfaceService
         Task<bool> DeleteLessonAsync(int id);
         Task<IEnumerable<LessonDTO>> GetFilesInFolderAsync(int folderId);
         Task<IEnumerable<Lesson>> GetRootFilesAsync(int ownerId);
-        Task<List<LessonDTO>> SearchFilesAsync(string searchTerm);
         Task<IEnumerable<LessonDTO>> GetUserLessonsAsync(int userId);
+        Task<IEnumerable<LessonDTO>> GetDeletedLessonsByOwnerIdAsync(int ownerId);
+        Task<bool> DeleteHardLessonAsync(int id);
+        Task<List<LessonDTO>> SearchFilesAsync(int userId, int currentFolderId, string query);
+        Task<IEnumerable<Lesson>> GetLessonsWithTranscriptAsync();
+        Task<IEnumerable<Lesson>> GetLessonsWithoutTranscriptAsync();
+
 
 
 

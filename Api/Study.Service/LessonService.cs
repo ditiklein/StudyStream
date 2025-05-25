@@ -99,6 +99,12 @@ namespace Study.Services
             await _repositoryManager.SaveAsync();
             return l;
         }
+        public async Task<bool> DeleteHardLessonAsync(int id)
+        {
+            bool l = await _lessonRepository.DeleteHardAsync(id);
+            await _repositoryManager.SaveAsync();
+            return l;
+        }
         public async Task<IEnumerable<LessonDTO>> GetFilesInFolderAsync(int folderId)
         {
             var lessons = await _lessonRepository.GetFilesInFolderAsync(folderId);
@@ -117,6 +123,26 @@ namespace Study.Services
         {
             var folders = await _lessonRepository.GetUserLessonsAsync(userId);
             return _mapper.Map<IEnumerable<LessonDTO>>(folders);
+        }
+
+        public async Task<IEnumerable<LessonDTO>> GetDeletedLessonsByOwnerIdAsync(int ownerId)
+        {
+            var lessons = await _lessonRepository.GetDeletedLessonsByOwnerIdAsync(ownerId);
+            return _mapper.Map<IEnumerable<LessonDTO>>(lessons);
+        }
+        public async Task<List<LessonDTO>> SearchFilesAsync(int userId, int currentFolderId, string query)
+        {
+            var files= await _lessonRepository.SearchFilesAsync(userId, currentFolderId, query);
+            return _mapper.Map<List<LessonDTO>>(files);
+        }
+        public async Task<IEnumerable<Lesson>> GetLessonsWithTranscriptAsync()
+        {
+            return await _lessonRepository.GetLessonsWithTranscriptAsync();
+        }
+
+        public async Task<IEnumerable<Lesson>> GetLessonsWithoutTranscriptAsync()
+        {
+            return await _lessonRepository.GetLessonsWithoutTranscriptAsync();
         }
 
 

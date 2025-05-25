@@ -1,35 +1,53 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {   
   Box,   
   Typography,   
   List,   
   ListItem,   
-  ListItemText   
+  ListItemText,
+  ListItemIcon,
+  Divider,
+  InputBase,
+  Paper,
+  IconButton
 } from '@mui/material';
-
-// הגדרת ממשקים לטיפוסי הפרופס
-interface Recording {
-  id: number;
-  lessonName: string;
-}
+import SearchIcon from '@mui/icons-material/Search';
+import AudioFileIcon from '@mui/icons-material/AudioFile';
 
 interface SidebarProps {
-  recordings: Recording[];
-  onSelectLesson?: (lesson: Recording) => void;
+  recordings: any[];
+  onSelectRecording: (recording: any) => void;
+  selectedRecording: any | null;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ recordings, onSelectLesson }) => {
-  const [selectedItem, setSelectedItem] = useState<Recording | null>(recordings[0] || null);
+const Sidebar: React.FC<SidebarProps> = ({ 
+  recordings, 
+  onSelectRecording,
+  selectedRecording 
+}) => {
+  const [searchText, setSearchText] = useState('');
+  const [filteredRecordings, setFilteredRecordings] = useState<any[]>(recordings);
 
-  const handleItemClick = (item: Recording) => {
-    setSelectedItem(item);
-    if (onSelectLesson) {
-      onSelectLesson(item);
+  useEffect(() => {
+    if (recordings) {
+      const filtered = searchText 
+        ? recordings.filter(item => 
+            removeFileExtension(item.lessonName)
+              .toLowerCase()
+              .includes(searchText.toLowerCase())
+          )
+        : recordings;
+      
+      setFilteredRecordings(filtered);
     }
-  };
+  }, [recordings, searchText]);
 
   const removeFileExtension = (filename: string): string => {
-    return filename.split('.').slice(0, -1).join('.'); // מסיר את הסיומת מהקובץ
+    return filename.split('.').slice(0, -1).join('.');
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
   };
 
   return (
@@ -39,68 +57,121 @@ const Sidebar: React.FC<SidebarProps> = ({ recordings, onSelectLesson }) => {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      pt: 4,
-      bgcolor: 'white'
+      overflow: 'hidden'
     }}>
-      <Typography
-        variant="h4"
-        sx={{
-          mb: 3,
-          fontWeight: 'bold',
-          color: 'text.primary',
-          textAlign: 'center'
-        }}
-      >
-        ההקלטות שלי
-      </Typography>
+      <Box sx={{ 
+        p: 3, 
+        width: '100%',
+        textAlign: 'center'
+      }}>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 'bold',
+            color: 'primary.main',
+            mb: 1
+          }}
+        >
+          ההקלטות שלי
+        </Typography>
+        
+        <Typography 
+          variant="body2" 
+          color="text.secondary"
+          sx={{ mb: 3 }}
+        >
+          בחר הקלטה לתמלול
+        </Typography>
+
+        <Paper
+          sx={{ 
+            p: '2px 4px', 
+            display: 'flex', 
+            alignItems: 'center',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.08)',
+            mb: 2
+          }}
+        >
+          <InputBase
+            sx={{ ml: 1, flex: 1 }}
+            placeholder="חיפוש הקלטות..."
+            value={searchText}
+            onChange={handleSearch}
+          />
+          <IconButton sx={{ p: '10px' }} aria-label="search">
+            <SearchIcon />
+          </IconButton>
+        </Paper>
+      </Box>
+
+      <Divider sx={{ width: '90%', mb: 2 }} />
 
       <Box sx={{
-        width: '90%',
-        maxWidth: '350px'
+        width: '100%',
+        flexGrow: 1,
+        overflow: 'auto',
+        px: 2
       }}>
-        <List sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2
-        }}>
-          {recordings.map((item) => (
-            <ListItem
-              key={item.id}
-              sx={{
-                cursor: 'pointer',
-                borderRadius: 3,
-                transition: 'all 0.3s ease',
-                ...(selectedItem === item ? {
-                  backgroundColor: '#FF0080',
-                  border: 'none',
-                  color: 'white',
-                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                } : {
-                  border: '1px solid',
-                  borderColor: 'grey.300',
-                  bgcolor: 'white',
-                  '&:hover': {
-                    bgcolor: 'grey.100',
-                    borderColor: 'primary.light',
-                    boxShadow: 1
-                  }
-                }),
-              }}
-              onClick={() => handleItemClick(item)}
-            >
-              <ListItemText
-                primary={removeFileExtension(item.lessonName)} 
-                primaryTypographyProps={{
-                  fontWeight: 'bold',
-                  color: selectedItem === item ? 'white' : 'text.primary'
+        {filteredRecordings.length > 0 ? (
+          <List sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1.5
+          }}>
+            {filteredRecordings.map((recording) => (
+              <ListItem
+                key={recording.id}
+                sx={{
+                  cursor: 'pointer',
+                  borderRadius: 2,
+                  transition: 'all 0.2s ease',
+                  padding: '8px 12px',
+                  ...(selectedRecording?.id === recording.id ? {
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.15)'
+                  } : {
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    bgcolor: 'background.paper',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      borderColor: 'primary.light',
+                    }
+                  }),
                 }}
-                secondaryTypographyProps={{
-                  color: selectedItem === item ? 'rgba(255,255,255,0.8)' : 'text.secondary'
-                }}
-              />
-            </ListItem>
-          ))}
-        </List>
+                onClick={() => onSelectRecording(recording)}
+              >
+                <ListItemIcon sx={{ 
+                  minWidth: 36,
+                  color: selectedRecording?.id === recording.id ? 'white' : 'primary.main'
+                }}>
+                  <AudioFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={removeFileExtension(recording.urlName)}
+                  primaryTypographyProps={{
+                    fontWeight: 'medium',
+                    fontSize: '0.95rem',
+                    color: selectedRecording?.id === recording.id ? 'white' : 'text.primary',
+                    noWrap: true
+                  }}
+                />
+              </ListItem>
+            ))}
+          </List>
+        ) : (
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            height: '100%' 
+          }}>
+            <Typography variant="body2" color="text.secondary">
+              לא נמצאו הקלטות
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   );

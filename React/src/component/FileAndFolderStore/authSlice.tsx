@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
 import { Rootstore } from "./FileStore";
 import User from "../../Modles/User";
+import api from "./Api";
 
 interface AuthState {
   token: string | null;
@@ -13,7 +13,7 @@ const storedToken = sessionStorage.getItem('token');
 const storedUser = sessionStorage.getItem('User');
 
 const initialState: AuthState = {
-  token: storedToken ? JSON.parse(storedToken) : null,
+  token: storedToken ? (storedToken) : null,
   user: storedUser ? JSON.parse(storedUser) : null,
   loading: false,
   error: null,
@@ -24,9 +24,13 @@ export const login = createAsyncThunk(
   "auth/login",
   async (credentials: { email: string; password: string }, thunkAPI) => {
     try {
-      const response = await axios.post<{ token: string; user: User }>("https://localhost:7147/api/Auth/login", credentials);
+      console.log(credentials);
+      
+      const response = await api.post<{ token: string; user: User }>("/Auth/login", credentials);
       return response.data;
     } catch (error: any) {
+      console.log(error.message);
+      
       return thunkAPI.rejectWithValue(error.response?.data?.message || "Login failed");
     }
   }
@@ -38,7 +42,7 @@ export const register = createAsyncThunk(
   async (newUser: {firstName:string,lastName:string,  email: string; password: string; }, thunkAPI) => {
     try {
 
-      const response = await axios.post('https://localhost:7147/api/Auth/register', {...newUser, roleName: 'User'});
+      const response = await api.post('/Auth/register', {...newUser, roleName: 'User'});
 
       return response.data;
     } catch (error) {

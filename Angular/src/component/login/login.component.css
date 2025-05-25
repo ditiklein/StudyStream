@@ -1,180 +1,356 @@
 :host {
   direction: rtl;
   display: block;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+:root {
+  /* צבעים ראשיים - תכלת, שחור ולבן */
+  --primary-color: #00b0d7; /* תכלת */
+  --primary-color-dark: #008db0; /* תכלת כהה */
+  --primary-color-light: #4fcae8; /* תכלת בהיר */
+  
+  --black-color: #333333; /* שחור טקסט */
+  --black-color-light: #666666; /* שחור בהיר יותר / אפור כהה */
+  --black-color-lighter: #999999; /* אפור */
+  
+  --white-color: #ffffff; /* לבן */
+  --white-color-dim: #f8f9fa; /* לבן מעט אפרפר */
+  --white-color-transparent: rgba(255, 255, 255, 0.95); /* לבן שקוף */
+
 }
 
-.split-container {
+
+/* מיכל ההתחברות */
+.login-container {
   display: flex;
-  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* שימוש ב-height במקום min-height */
   width: 100%;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.overlay {
+/* עיגולים אנימטיביים ברקע - אנימציה מוגברת */
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(45deg, rgba(32, 201, 151, 0.1), rgba(14, 120, 95, 0.05));
+  /* הגברת האנימציה: מהירות מוגברת (15s במקום 20s) ושינוי סוג האנימציה */
+  animation: float 15s infinite ease-in-out;
+}
+
+.circle-1 {
+  width: 400px;
+  height: 400px;
+  top: -100px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+.circle-2 {
+  width: 300px;
+  height: 300px;
+  bottom: -50px;
+  right: -50px;
+  animation-delay: -3s;
+}
+
+.circle-3 {
+  width: 200px;
+  height: 200px;
+  top: 40%;
+  left: 15%;
+  animation-delay: -6s;
+}
+
+.circle-4 {
+  width: 150px;
+  height: 150px;
+  bottom: 30%;
+  right: 15%;
+  animation-delay: -9s;
+}
+
+.circle-5 {
+  width: 250px;
+  height: 250px;
+  top: 20%;
+  right: 10%;
+  animation-delay: -12s;
+}
+
+/* אנימציה משופרת עם תנועה רחבה יותר */
+@keyframes float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -20px) scale(1.05);
+  }
+  50% {
+    transform: translate(0, 30px) scale(0.95);
+  }
+  75% {
+    transform: translate(-20px, 10px) scale(1.03);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* עטיפת כרטיס ההתחברות */
+.login-card-wrapper {
+  width: 100%;
+  max-width: 450px;
+  z-index: 10;
+  margin: 0;
+  position: relative;
+  /* מגביל את הגובה המקסימלי כדי להבטיח רווח מלמעלה ומלמטה */
+  max-height: 90vh; /* 90% מגובה המסך */
+  display: flex;
+  justify-content: center;
+}
+
+/* כרטיס התחברות - עם רקע שחור */
+.login-card {
+  background-color: #222222; /* רקע שחור */
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 30px 25px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 
+              0 0 0 1px rgba(32, 201, 151, 0.1),
+              0 0 20px rgba(32, 201, 151, 0.1);
+  position: relative;
+  overflow: hidden; /* מונע גלילה בתוך הכרטיס */
+  width: 100%;
+  box-sizing: border-box;
+  /* שוליים מוגדרים לרווח מלמעלה ומלמטה */
+  margin: 5vh 0;
+  /* גובה מותאם אוטומטית לתוכן */
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-card::before {
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: rgba(67, 97, 238, 0.3);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
-  color: white;
-  text-align: center;
+  height: 5px;
+  background: linear-gradient(90deg, #20c997, #12977b);
 }
 
-.overlay h2 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-}
-
-.overlay p {
-  font-size: 1.2rem;
-  max-width: 500px;
-  line-height: 1.6;
-}
-
-/* Login Section */
-.login-section {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f9f9f9;
-  padding: 20px;
-}
-
-.login-card-container {
-  width: 100%;
-  max-width: 450px;
-}
-
-.login-card {
-  padding: 40px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  background-color: white;
-}
-
+/* עיצוב כותרות וטקסט - מותאם לרקע שחור */
 .login-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px; /* מרווח קטן יותר */
+  color: #ffffff; /* טקסט לבן */
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px; /* מרווח קטן יותר */
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffffff; /* טקסט לבן */
+}
+
+.logo-container mat-icon {
+  font-size: 2.2rem;
+  height: 2.2rem;
+  width: 2.2rem;
+  margin-left: 10px;
+  color: #20c997;
+  animation: pulse 3s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .login-header h1 {
   font-size: 2rem;
-  font-weight: 700;
-  color: #2b2d42;
+  font-weight: 600;
   margin-bottom: 10px;
+  background: linear-gradient(90deg, #20c997, #12977b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 5px rgba(32, 201, 151, 0.2);
 }
 
 .login-header p {
-  color: #666;
+  color: #aaaaaa; /* טקסט אפור בהיר יותר */
   font-size: 1rem;
+  margin-bottom: 10px;
 }
 
+/* טופס */
 .login-form {
   display: flex;
   flex-direction: column;
 }
 
+/* עיצוב שדות טופס - מותאם לרקע שחור */
+mat-form-field {
+  width: 100%;
+  margin-bottom: 15px; /* מרווח קטן יותר */
+}
 
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+  background-color: rgba(255, 255, 255, 0.1); /* רקע כהה לשדות */
+  border-radius: 8px 8px 0 0;
+  padding: 0.75rem 0.75rem 0 0.75rem;
+}
 
+::ng-deep .mat-form-field-label {
+  color: #aaaaaa; /* צבע תוויות בהיר יותר */
+}
+
+::ng-deep .mat-input-element {
+  color: #ffffff; /* טקסט לבן */
+}
+
+::ng-deep .mat-form-field-underline {
+  background-color: rgba(32, 201, 151, 0.5);
+}
+
+::ng-deep .mat-form-field-ripple {
+  background-color: #20c997;
+}
+
+::ng-deep .mat-icon {
+  color: #20c997;
+}
+
+/* אפשרויות טופס */
 .form-options {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 20px; /* מרווח קטן יותר */
   flex-direction: row-reverse;
 }
 
+::ng-deep .mat-checkbox-checked.mat-primary .mat-checkbox-background {
+  background-color: #20c997;
+}
+
+/* עיצוב צ'קבוקס על רקע כהה */
+::ng-deep .mat-checkbox-label {
+  color: #ffffff; /* טקסט לבן */
+}
+
 .forgot-password {
-  color: #4361ee;
+  color: #20c997;
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, transform 0.3s ease;
 }
 
 .forgot-password:hover {
-  color: #f72585;
+  color: #4fdbb2; /* צבע בהיר יותר למעבר עכבר על רקע כהה */
   text-decoration: underline;
+  transform: translateX(-3px);
 }
 
+/* כפתור התחברות */
 .login-button {
-  height: 50px;
+  height: 50px; /* גובה מעט קטן יותר */
   font-size: 1.1rem;
   font-weight: 600;
-  background: linear-gradient(120deg, #4361ee, #7209b7);
-  border-radius: 50px;
-  margin-bottom: 20px;
+  background: linear-gradient(45deg, #12977b, #20c997);
+  border-radius: 12px;
+  margin-bottom: 0; /* ללא שוליים תחתונים */
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+  box-shadow: 0 8px 20px rgba(32, 201, 151, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.login-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.6s ease;
+}
+
+.login-button:hover::before {
+  left: 100%;
 }
 
 .login-button:hover:not([disabled]) {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+  box-shadow: 0 12px 25px rgba(32, 201, 151, 0.4);
 }
 
-.register-link {
-  text-align: center;
+.login-button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.image-section {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.login-button mat-icon {
+  font-size: 1.2rem;
 }
 
-.background-image {
-  position: absolute;
-  width: 100%;
+/* תחתית הכרטיס - הסרת התוכן */
+.card-footer {
+  display: none; /* מסתיר את האזור לחלוטין */
+}
+
+/* עיצוב רספונסיבי */
+@media (max-width: 600px) {
+  .login-card {
+    padding: 25px 15px;
+    margin: 2vh 0;
+  }
+  
+  .login-header h1 {
+    font-size: 1.6rem;
+  }
+  
+  .login-header p {
+    font-size: 0.9rem;
+  }
+  
+  .circle-1, .circle-2 {
+    opacity: 0.5;
+  }
+}
+
+/* מניעת גלילה */
+html, body {
   height: 100%;
-  object-fit: cover;
-  z-index: 0;
-}
-
-.overlay {
-  z-index: 1;
-}
-
-.register-link span {
-  color: #666;
-}
-
-.register-button {
-  color: #f72585;
-  text-decoration: none;
-  font-weight: 600;
-  cursor: pointer;
-  margin-right: 5px;
-}
-
-.register-button:hover {
-  text-decoration: underline;
-}
-
-/* Responsive design */
-@media (max-width: 1024px) {
-  .split-container {
-    flex-direction: column;
-  }
-  
-  .image-section {
-    height: 250px;
-  }
-  
-  .login-section {
-    padding: 40px 20px;
-  }
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }

@@ -2,14 +2,6 @@ import { CacheProvider, ThemeProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import rtlPlugin from 'stylis-plugin-rtl';
 import { createTheme, CssBaseline } from '@mui/material';
-
-
-
-
-
-
-
-
 import { RouterProvider } from 'react-router-dom';
 import { Router } from './router';
 
@@ -117,41 +109,3 @@ export default App;
 
 
 
-// function App() {
-//       return (
-// <KeyPointsExtractor></KeyPointsExtractor>
-//       );
-//     }
-    
-//   export default App
-
-
-//   function App() {
-//     return (
-//       <CacheProvider value={cacheRtl}>
-//       <ThemeProvider theme={theme}>
-//         <CssBaseline />
-//         <div dir="rtl">
-//           <RouterProvider router={Router} /> 
-//         </div>
-//       </ThemeProvider>
-//     </CacheProvider>
-
-//     );
-//   }
-  
-// export default App;
-
-
-
-
-
-
-
-// // function App() {
-// //       return (
-// //         <FileUploader></FileUploader>
-// //       );
-// //     }
-    
-// //   export default App

@@ -125,22 +125,23 @@ namespace Study.Service
 
             return userRole.Role.RoleName;
         }
-        //public async Task<List<UserGrowthDTO>> GetUserGrowthByMonthAsync()
-        //{
-        //    var result =await GetAllUsersAsync()
-        //        .GroupBy(u => new { Year = u.CreatedAt.Year, Month = u.CreatedAt.Month })
-        //        .Select(g => new UserGrowthDTO
-        //        {
-        //            Year = g.Key.Year,
-        //            Month = g.Key.Month,
-        //            UserCount = g.Count()
-        //        })
-        //        .OrderBy(x => x.Year)
-        //        .ThenBy(x => x.Month)
-        //        .ToList();
+        public async Task<List<UserGrowthDTO>> GetUserGrowthByMonthAsync()
+        {
+            var users = await GetAllUsersAsync(); // מחכים לנתונים
+            var result = users
+                .GroupBy(u => new { Year = u.CreatedAt.Year, Month = u.CreatedAt.Month })
+                .Select(g => new UserGrowthDTO
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    UserCount = g.Count()
+                })
+                .OrderBy(x => x.Year)
+                .ThenBy(x => x.Month)
+                .ToList(); // לא צריך ToListAsync כי הנתונים כבר בזיכרון
 
-        //    return result;
-        //}
+            return result;
+        }
 
 
     }

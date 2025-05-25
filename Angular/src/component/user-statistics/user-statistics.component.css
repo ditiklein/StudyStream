@@ -1,0 +1,197 @@
+:root {
+  /* צבעים ראשיים - תכלת וגוונים */
+  --primary-color: #12977b; /* תכלת שביקשת */
+  --primary-color-dark: #0e7961; /* תכלת כהה */
+  --primary-color-light: #16b592; /* תכלת בהיר */
+
+  /* גוונים של שחור */
+  --black-color: #333333; /* שחור טקסט */
+  --black-color-light: #666666; /* שחור בהיר יותר / אפור כהה */
+  --black-color-lighter: #999999; /* אפור */
+
+  /* גוונים של לבן */
+  --white-color: #ffffff; /* לבן */
+  --white-color-dim: #f8f9fa; /* לבן מעט אפרפר */
+  --white-color-transparent: rgba(255, 255, 255, 0.95); /* לבן שקוף */
+}
+
+/* הסרת רקע מהגרפים כפי שביקשת */
+.chart-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+  transition: transform 0.3s ease;
+  /* הסרת הקו ורקע מהגרפים */
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: none;
+}
+
+.chart-container:hover {
+  transform: scale(1.01);
+}
+
+.user-statistics-table {
+  max-width: 900px;
+  margin: 30px auto;
+  overflow-x: auto;
+}
+
+.table-scroll {
+  max-height: 400px;
+  overflow: auto;
+}
+
+.system-statistics-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin: 30px auto;
+  max-width: 900px;
+}
+
+mat-card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.cards-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* עדכון לכרטיסי סטטיסטיקה - הקטנת טקסטים כפי שביקשת */
+.stat-card {
+  width: 200px; /* הקטנת הרוחב */
+  padding: 12px; /* הקטנת הריפוד */
+  flex: 1;
+  text-align: center;
+  font-size: 18px; /* הקטנת גודל טקסט */
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: var(--white-color);
+  color: var(--black-color);
+}
+
+.stat-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* הקטנת טקסט הכותרת בכרטיסי סטטיסטיקה */
+.stat-card h1 {
+  margin-bottom: 20px; /* פחות מרווח תחתון */
+  color: var(--black-color); /* שימוש בשחור בהתאם לבקשה */
+  font-weight: bold;
+  font-size: 16px; /* טקסט קטן יותר */
+}
+
+.charts-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.chart-container {
+  flex: 1;
+  min-width: 400px;
+  min-height: 300px;
+}
+
+/* סגנון ספציפי לגרף העוגה - הזזה לצד שמאל */
+.pie-chart-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* יישור לשמאל */
+  min-height: 350px;
+}
+
+.pie-chart-legend {
+  padding: 20px;
+  border-right: 1px solid var(--primary-color-light);
+  font-size: 14px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  margin-left: 8px;
+  border-radius: 2px;
+}
+
+.sen {
+  font-size: 24px; /* הקטנת גודל הכותרת */
+  text-align: center; /* מרכוז במקום padding-left */
+  margin-bottom: 30px; /* הקטנת המרווח התחתון */
+  margin-top: 10px;
+  color: var(--black-color); /* שימוש בשחור כפי שביקשת */
+  font-weight: bold;
+}
+
+/* סגנון לטבלה */
+table.mat-table {
+  width: 100%;
+  background-color: var(--white-color);
+}
+
+th.mat-header-cell {
+  background-color: var(--primary-color);
+  color: var(--white-color);
+  font-weight: bold;
+  padding: 12px;
+}
+
+td.mat-cell {
+  padding: 12px;
+  color: var(--black-color);
+}
+
+tr.mat-row:hover {
+  background-color: rgba(18, 151, 123, 0.1);
+}
+
+/* סגנון לdivider */
+mat-divider {
+  background-color: var(--black-color-lighter); /* שימוש בשחור כפי שביקשת */
+  height: 2px;
+}
+
+/* סגנון לpaginator */
+mat-paginator {
+  background-color: var(--white-color-dim);
+  color: var(--black-color);
+}
+
+/* הוספת התאמות רספונסיביות */
+@media (max-width: 900px) {
+  .chart-container {
+    min-width: 100%;
+  }
+  
+  .cards-container {
+    flex-direction: column;
+  }
+  
+  .stat-card {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  .sen {
+    padding-left: 0;
+    text-align: center;
+  }
+}

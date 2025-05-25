@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit {
       this.authService.loginUser(userData).subscribe({
             next: (response) => {
                 sessionStorage.setItem('token',response.token);
-                this.router.navigate(['users']);
+                this.router.navigate(['navbar']);
             },
             error: (err) => {
               

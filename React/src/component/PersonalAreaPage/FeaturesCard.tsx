@@ -59,7 +59,7 @@ const FeatureCards = () => {
       color: '#4e7df9',
       onClick: () => {
         console.log('Content summary feature clicked');
-        // Add navigation or action as needed
+        navigate('/point');
       }
     },
     {
@@ -69,7 +69,7 @@ const FeatureCards = () => {
       color: '#52c41a',
       onClick: () => {
         console.log('File sharing feature clicked');
-        // Add navigation or action as needed
+        // navigate('/share');
       }
     }
   ];

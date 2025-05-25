@@ -1,0 +1,425 @@
+.dialog-container {
+  /* צבעים */
+  --dialog-primary: #12977b;
+  --dialog-primary-dark: #0f7a64;
+  --dialog-primary-light: #15b48f;
+  --dialog-gradient: linear-gradient(135deg, var(--dialog-primary) 0%, var(--dialog-primary-dark) 100%);
+  
+  --dialog-text: #333333;
+  --dialog-text-light: #666666;
+  --dialog-text-lighter: #999999;
+  
+  --dialog-bg: #ffffff;
+  --dialog-bg-light: #f8f9fa;
+  --dialog-bg-accent: #f8fffe;
+  
+  --dialog-border: #e0f2ef;
+  --dialog-border-light: #f0f0f0;
+  
+  --dialog-success: #28a745;
+  --dialog-error: #dc3545;
+  
+  /* צללים */
+  --dialog-shadow-light: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --dialog-shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --dialog-shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.16);
+  
+  /* עיגולים */
+  --dialog-radius: 12px;
+  --dialog-radius-small: 8px;
+  
+  /* מעברים */
+  --dialog-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* הגדרות בסיסיות */
+  direction: rtl;
+  font-family: 'Segoe UI', 'Heebo', 'Arial', sans-serif;
+  max-width: 700px;
+  max-height: 90vh; 
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--dialog-radius);
+  box-shadow: var(--dialog-shadow-heavy);
+}
+
+/* כותרת הדיאלוג */
+.dialog-container .dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--dialog-bg);
+  font-weight: 600;
+  margin: 0;
+  padding: 1.5rem;
+  background: var(--dialog-gradient);
+  border-radius: var(--dialog-radius) var(--dialog-radius) 0 0;
+  box-shadow: var(--dialog-shadow-light);
+  font-size: 1.2rem;
+}
+
+.dialog-container .title-icon {
+  color: var(--dialog-bg);
+  font-size: 1.5rem;
+}
+
+/* תוכן הדיאלוג */
+.dialog-container .dialog-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: var(--dialog-bg);
+}
+
+/* תצוגת ההודעה */
+.dialog-container .message-preview {
+  padding: 1.25rem;
+  background: linear-gradient(135deg, var(--dialog-bg-accent), #f0faf8);
+  border: 1px solid var(--dialog-border);
+  border-radius: var(--dialog-radius);
+  box-shadow: var(--dialog-shadow-light);
+}
+
+.dialog-container .preview-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1rem 0;
+  color: var(--dialog-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.dialog-container .preview-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dialog-container .preview-item {
+  font-size: 0.95rem;
+  color: var(--dialog-text);
+  line-height: 1.5;
+  padding: 0.5rem 0;
+}
+
+
+/* מפריד */
+/*  */
+
+.dialog-container .control-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+}
+
+.dialog-container .control-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  border-radius: var(--dialog-radius-small);
+  transition: var(--dialog-transition);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--dialog-border);
+  background: var(--dialog-bg);
+  color: var(--dialog-text);
+  cursor: pointer;
+}
+
+.dialog-container .control-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--dialog-shadow-medium);
+  border-color: var(--dialog-primary);
+  color: var(--dialog-primary);
+}
+
+.dialog-container .selection-summary {
+  text-align: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(18, 151, 123, 0.1), rgba(18, 151, 123, 0.05));
+  border-radius: var(--dialog-radius-small);
+  font-weight: 600;
+  color: var(--dialog-primary);
+  margin: 0 1rem;
+  border: 1px solid rgba(18, 151, 123, 0.2);
+}
+
+/* שדה חיפוש */
+.dialog-container .search-field {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.dialog-container .search-field .mat-mdc-form-field-outline,
+.dialog-container .search-field .mat-form-field-outline {
+  border-radius: var(--dialog-radius) !important;
+}
+
+
+/* גלילה מותאמת אישית */
+
+.dialog-container .user-item {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--dialog-border-light);
+  cursor: pointer;
+  transition: var(--dialog-transition);
+  background: var(--dialog-bg);
+  position: relative;
+}
+
+.dialog-container .user-item::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: var(--dialog-transition);
+}
+
+.dialog-container .user-item:hover {
+  background: linear-gradient(135deg, rgba(18, 151, 123, 0.05), rgba(18, 151, 123, 0.02));
+  transform: translateX(-3px);
+}
+
+.dialog-container .user-item:hover::before {
+  background: var(--dialog-primary);
+}
+
+.dialog-container .user-item:last-child {
+  border-bottom: none;
+}
+
+.dialog-container .user-checkbox {
+  margin-left: 1rem;
+}
+
+.dialog-container .user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.dialog-container .user-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: var(--dialog-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dialog-bg);
+  box-shadow: 0 3px 10px rgba(18, 151, 123, 0.3);
+  font-size: 1.2rem;
+}
+
+.dialog-container .user-details {
+  flex: 1;
+}
+
+.dialog-container .user-name {
+  font-weight: 600;
+  color: var(--dialog-text);
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+}
+
+.dialog-container .user-email {
+  font-size: 0.9rem;
+  color: var(--dialog-text-light);
+}
+
+.dialog-container .user-status {
+  display: flex;
+  align-items: center;
+}
+
+.dialog-container .status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.dialog-container .status-badge.active {
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(40, 167, 69, 0.05));
+  color: var(--dialog-success);
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.dialog-container .status-icon {
+  font-size: 1rem;
+}
+
+/* מצב ריק */
+.dialog-container .empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--dialog-text-light);
+}
+
+.dialog-container .empty-icon {
+  font-size: 5rem;
+  color: #ddd;
+  margin-bottom: 1.5rem;
+}
+
+.dialog-container .empty-state h3 {
+  margin: 0 0 0.75rem 0;
+  color: var(--dialog-text);
+  font-weight: 600;
+}
+
+.dialog-container .empty-state p {
+  margin: 0;
+  color: var(--dialog-text-light);
+  font-size: 0.95rem;
+}
+
+/* כפתורי פעולה */
+.dialog-container .dialog-actions {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--dialog-border);
+  background: linear-gradient(135deg, var(--dialog-bg-accent), #f0faf8);
+  border-radius: 0 0 var(--dialog-radius) var(--dialog-radius);
+}
+
+.dialog-container .action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 140px;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--dialog-radius-small);
+  font-weight: 500;
+  transition: var(--dialog-transition);
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.dialog-container .action-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--dialog-shadow-medium);
+}
+
+.dialog-container .cancel-btn {
+  border: 1px solid #ddd;
+  color: var(--dialog-text-light);
+  background: var(--dialog-bg);
+}
+
+.dialog-container .cancel-btn:hover {
+  border-color: var(--dialog-primary);
+  color: var(--dialog-primary);
+}
+
+.dialog-container .confirm-btn {
+  background: var(--dialog-gradient);
+  color: var(--dialog-bg);
+  border: none;
+}
+
+.dialog-container .confirm-btn:disabled {
+  background: #ccc;
+  color: #888;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* אנימציות */
+@keyframes dialogFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dialog-container {
+  animation: dialogFadeIn 0.3s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dialog-container {
+    max-width: 95vw;
+    margin: 1rem;
+    max-height: 95vh;
+  }
+
+  .dialog-container .dialog-title {
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .dialog-container .dialog-content {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .dialog-container .control-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .dialog-container .control-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dialog-container .dialog-actions {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .dialog-container .action-btn {
+    min-width: auto;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dialog-container .user-item {
+    padding: 1rem;
+  }
+
+  .dialog-container .user-info {
+    gap: 0.75rem;
+  }
+
+  .dialog-container .user-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .dialog-container .users-container {
+    max-height: 300px;
+  }
+
+  .dialog-container .message-preview {
+    padding: 1rem;
+  }
+
+  .dialog-container .selection-controls {
+    padding: 0.75rem 0;
+  }
+}

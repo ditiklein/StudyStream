@@ -1,0 +1,154 @@
+<div class="message-page">
+    <!-- כותרת העמוד -->
+    <div class="page-header">
+      <h1 class="page-title">מערכת שליחת הודעות</h1>
+      <p class="page-subtitle">שלח הודעות לכל המשתמשים או לקבוצה נבחרת</p>
+    </div>
+  
+    <!-- מיכל ראשי -->
+    <div class="main-container">
+      <!-- צד שמאל - טופס השליחה -->
+      <div class="message-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="title-icon">📝</span>
+            יצירת הודעה חדשה
+          </h2>
+        </div>
+  
+        <!-- הודעות מצב -->
+        @if (error) {
+          <div class="alert alert-error">
+            <span class="alert-icon">⚠️</span>
+            <span>{{ error }}</span>
+          </div>
+        }
+        
+        @if (success) {
+          <div class="alert alert-success">
+            <span class="alert-icon">✅</span>
+            <span>{{ success }}</span>
+          </div>
+        }
+  
+        <!-- טופס שליחת הודעה -->
+        <form (submit)="$event.preventDefault(); openUserSelectionDialog()">
+          <div class="form-group">
+            <label for="subject" class="form-label">
+              <span class="label-icon">📋</span>
+              נושא ההודעה
+            </label>
+            <input
+              type="text"
+              id="subject"
+              name="subject"
+              [(ngModel)]="messageForm.subject"
+              required
+              placeholder="הכנס נושא מעניין ורלוונטי להודעה"
+              class="form-input"
+              [disabled]="sendingMessages"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="body" class="form-label">
+              <span class="label-icon">💬</span>
+              תוכן ההודעה
+            </label>
+            <textarea
+              id="body"
+              name="body"
+              [(ngModel)]="messageForm.body"
+              required
+              rows="8"
+              placeholder="כתב את ההודעה שלך כאן... ודא שהתוכן ברור ומובן לכל הנמענים"
+              class="form-textarea"
+              [disabled]="sendingMessages"
+            ></textarea>
+            <div class="textarea-help">
+              💡 טיפ: כתוב בבהירות ובקצרה, והוסף קריאה לפעולה אם נדרש
+            </div>
+          </div>
+  
+          <!-- כפתורי פעולה -->
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="clearForm()"
+              [disabled]="sendingMessages"
+            >
+              <span class="btn-icon">🗑️</span>
+              נקה טופס
+            </button>
+            
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="sendingMessages || !messageForm.subject.trim() || !messageForm.body.trim()"
+            >
+              @if (!sendingMessages) {
+                <span class="btn-icon">📤</span>
+                <span>בחר נמענים ושלח</span>
+              } @else {
+                <span class="btn-icon loading-spinner">⏳</span>
+                <span>שולח הודעות...</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+  
+      <!-- צד ימין - סטטיסטיקות -->
+      <div class="stats-section">
+        <div class="stats-header">
+          <h3 class="stats-title">
+            <span class="title-icon">📊</span>
+            נתונים
+          </h3>
+        </div>
+  
+        <div class="stats-cards">
+          <div class="stat-card">
+            <div class="stat-icon total-users">👥</div>
+            <div class="stat-content">
+              <h4 class="stat-number">{{ users.length }}</h4>
+              <p class="stat-label">סך משתמשים</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon selected-users">📧</div>
+            <div class="stat-content">
+              <h4 class="stat-number">{{ selectedUsers.length }}</h4>
+              <p class="stat-label">נמענים נבחרים</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon last-sent">✉️</div>
+            <div class="stat-content">
+              <h4 class="stat-number">{{ lastSentCount || 0 }}</h4>
+              <p class="stat-label">נשלחו בפעם האחרונה</p>
+            </div>
+          </div>
+        </div>
+  
+        <!-- מידע נוסף -->
+        <div class="additional-info">
+          <div class="info-item">
+            <span class="info-icon">🎯</span>
+            <span class="info-text">בחר נמענים ספציפיים או שלח לכולם</span>
+          </div>
+          <div class="info-item">
+            <span class="info-icon">⚡</span>
+            <span class="info-text">שליחה מהירה ובטוחה</span>
+          </div>
+          <div class="info-item">
+            <span class="info-icon">📈</span>
+            <span class="info-text">מעקב אחר סטטוס השליחה</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

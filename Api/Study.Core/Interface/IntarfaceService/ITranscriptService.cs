@@ -17,7 +17,9 @@ namespace Study.Core.Interface.IntarfaceService
            Task<TranscriptDTO> UpdateTranscriptAsync(int id, TranscriptDTO transcript);
            Task<TranscriptDTO> AddTranscriptAsync(TranscriptDTO transcript);
            Task<bool> DeleteTranscriptAsync(int id);
-        }
+           Task<TranscriptDTO> GetTranscriptByLessonIdAsync(int lessonId);
 
-    
+    }
+
+
 }

@@ -55,7 +55,7 @@ const StyledTextField = styled(TextField)({
 
 const Register = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: Rootstore) => state.auth);
+  const { token, loading, error } = useSelector((state: Rootstore) => state.auth);
   const navigate = useNavigate();
 
   const [newUser, setNewUser] = useState({
@@ -86,6 +86,7 @@ const Register = () => {
 
     try {
       const resultAction = await dispatch(register(newUser));
+      sessionStorage.setItem('token', token || '');
       if (register.fulfilled.match(resultAction)) {
         sessionStorage.setItem('User', JSON.stringify(resultAction.payload.user));
         navigate("/personal");
@@ -103,13 +104,23 @@ const Register = () => {
       direction: 'rtl' 
     }}>
       <Grid container sx={{ minHeight: '100vh' }}>
+        {/* תמונה בצד שמאל */}
+        <Grid item xs={12} md={6} sx={{
+          backgroundImage: 'url(/d.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          order: { xs: 2, md: 1 }
+        }}></Grid>
+
+        {/* טופס בצד ימין */}
         <Grid item xs={12} md={6} sx={{ 
           display: 'flex', 
           flexDirection: 'column', 
           justifyContent: 'center',
           p: 4,
           bgcolor: primaryColor, 
-          color: 'white'
+          color: 'white',
+          order: { xs: 1, md: 2 }
         }}>
           <Container maxWidth="sm">
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -119,6 +130,7 @@ const Register = () => {
                 align="center" 
                 sx={{ 
                   fontWeight: 'bold',
+                  direction: "ltr", 
                   color: 'transparent',
                   textShadow: '0 0 15px rgba(255,255,255,0.7), 0 0 30px rgba(255,255,255,0.5)',
                   WebkitTextStroke: '1px white', 
@@ -135,7 +147,7 @@ const Register = () => {
                 כיף שבאת<br />אורח.ת!
               </Typography>
               
-              <Typography variant="h5" component="h1" mb={1} sx={{ color: 'white' }}>
+              <Typography variant="h5" component="h1" mb={1} sx={{ color: 'white', direction: 'ltr' }}>
                 מוכנים להצטרף אלינו?
               </Typography>
               
@@ -244,12 +256,6 @@ const Register = () => {
             </Box>
           </Container>
         </Grid>
-
-        <Grid item xs={12} md={6} sx={{
-          backgroundImage: 'url(/d.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}></Grid>
       </Grid>
     </Box>
   );

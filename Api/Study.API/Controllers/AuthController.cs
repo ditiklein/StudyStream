@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Study.API.Models;
 using Study.Core.DTOs;
+using Study.Core.Entities;
 using Study.Core.Interface.IntarfaceService;
 using Study.Core.Interface.InterfaceRepository;
 using Study.Data.Repository;
@@ -35,13 +36,13 @@ public class AuthController : ControllerBase
         var user =await _userService.GetUserByEmailAsync(model.Email);
         if (roleName == "Admin")
         {
-            var token = _authService.GenerateJwtToken(model.Email, new[] { "Admin" });
+            var token = _authService.GenerateJwtToken(user.Id,model.Email, new[] { "Admin" });
             return Ok(new { Token = token, User = user });
         }
 
         else if (roleName == "User")
         {
-            var token = _authService.GenerateJwtToken(model.Email, new[] { "User" });
+            var token = _authService.GenerateJwtToken(user.Id,model.Email, new[] { "User" });
             return Ok(new { Token = token , User = user });
         }
          
@@ -72,7 +73,7 @@ public class AuthController : ControllerBase
         if (userRole == null)
             return BadRequest("Error assigning role to user.");
 
-        var token = _authService.GenerateJwtToken(model.Email, new[] { model.RoleName });
+        var token = _authService.GenerateJwtToken(existingUser.Id,model.Email, new[] { model.RoleName });
         return Ok(new { Token = token,User=existingUser });
     }
 }

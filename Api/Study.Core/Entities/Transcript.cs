@@ -12,6 +12,7 @@ namespace Study.Core.Entities
     {
         public int Id { get; set; }
         public string? TranscriptUrl { get; set; }
+        public string? UserName { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public int UpdateBy { get; set; }

@@ -17,7 +17,7 @@ namespace Study.Core.Interface.IntarfaceService
         Task<bool> DeleteUserAsync(int id);
         Task<UserDTO> GetUserByEmailAsync(string email);
         Task< string> AuthenticateAsync(string email, string password);
-        //Task<List<UserGrowthDTO>> GetUserGrowthByMonthAsync();
+        Task<List<UserGrowthDTO>> GetUserGrowthByMonthAsync();
 
     }
 }

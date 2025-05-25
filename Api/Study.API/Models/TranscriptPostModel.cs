@@ -7,6 +7,8 @@ namespace Study.API.Models
         public int LessonId { get; set; }  // מזהה השיעור
 
         public string TranscriptUrl { get; set; }  // קישור לתמלול
+        public string? UserName { get; set; }
+
 
     }
 }

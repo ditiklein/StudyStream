@@ -1,0 +1,31 @@
+<div class="body" dir="rtl">
+  <mat-toolbar class="mat-toolbar">
+   
+
+    <nav class="menu">
+      <a class="menu-item" [routerLink]="['/navbar', 'home']">
+        <mat-icon>home</mat-icon> בית
+      </a>
+      <span class="separator"></span>
+
+      <a class="menu-item" [routerLink]="['/navbar', 'users']">
+        <mat-icon>school</mat-icon> משתמשים
+      </a>
+      <span class="separator"></span>
+
+      <a class="menu-item" [routerLink]="['/navbar','user-statistics']">
+        <mat-icon>bar_chart</mat-icon> סטטיסטיקות
+      </a>
+      <span class="separator"></span>
+
+      <a class="menu-item" [routerLink]="['/navbar','massage']">
+        <mat-icon>send</mat-icon> הודעות
+      </a>
+    </nav>
+    <div class="branding">
+      <span class="branding-text">StudyStream Admin</span>
+    </div>
+  </mat-toolbar>
+
+  <router-outlet></router-outlet>
+</div>

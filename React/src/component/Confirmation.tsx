@@ -1,6 +1,7 @@
 import axios, { AxiosProgressEvent } from "axios";
 import { AppDispatch } from "./FileAndFolderStore/FileStore";
 import { addFile } from "./FileAndFolderStore/FilesSlice";
+import api from "./FileAndFolderStore/Api";
 
 export const handleConfirmation = async (
   files: File[],
@@ -9,9 +10,10 @@ export const handleConfirmation = async (
   dispatch: AppDispatch,
   setUploadProgress: (progress: number) => void,
   setIsDialogOpen: (open: boolean) => void,
-  setSelectedFiles: (files: File[]) => void
+  setSelectedFiles: (files: File[]) => void,
+  descriptions: string[] // מערך של תיאורים לכל קובץ
 ) => {
-
+  const user = JSON.parse(sessionStorage.getItem('User') || 'null');    
   if (files.length === 0) {
     setIsDialogOpen(false);
     return;
@@ -19,18 +21,28 @@ export const handleConfirmation = async (
 
   if (shouldUpload) {
     try {
-      for (const file of files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const description = descriptions[i] || '';
         setUploadProgress(0);
 
-        const response = await axios.get<{ url: string }>(
-          "https://localhost:7147/api/upload/presigned-url",
-          
+        // יצירת אובייקט DB לפני ההעלאה
+        const dbFile = {
+          lessonName: file.name,
+          description: description,
+          fileType: file.type,
+          folderId: parentId,
+          ownerId: user.id
+        };
+
+        const response = await api.get<{ url: string }>(
+          "/upload/presigned-url",
           { params: { fileName: file.name } }
         );
 
         const presignedUrl = response.data.url;
 
-    const response1=    await axios.put(presignedUrl, file, {
+        await axios.put(presignedUrl, file, {
           headers: { "Content-Type": file.type },
           onUploadProgress: (progressEvent: AxiosProgressEvent) => {
             const percent = Math.round(
@@ -39,25 +51,10 @@ export const handleConfirmation = async (
             setUploadProgress(percent);
           },
         });
-        console.log(response1,"hgfdfgh");
         
-
-        const downloadResponse = await axios.get<string>(
-          `https://localhost:7147/api/upload/download-url/${file.name}`
-        );
-        const downloadUrl = downloadResponse.data;
-
-        dispatch(
-          addFile({
-            lessonName: file.name,
-            ownerId: 3,
-            fileType: file.type,
-            url: downloadUrl,
-            folderId: parentId,
-          })
-        );
+        // שימוש באובייקט DB לשליחה לשרת
+        dispatch(addFile(dbFile));
       }
-
       alert("העלאה הושלמה בהצלחה!");
       setUploadProgress(0);
       setIsDialogOpen(false);
@@ -68,6 +65,8 @@ export const handleConfirmation = async (
     }
   }
 };
+
+
 // export const handleConfirmation = (
 //     selectedFiles, 
 //     confirmed, 

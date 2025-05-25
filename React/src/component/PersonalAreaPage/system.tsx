@@ -17,9 +17,6 @@ export const FileUploadSystem: React.FC<Id> = ({ parentId }) => {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const dispatch = useDispatch<AppDispatch>();
-  // const storedUser = sessionStorage.getItem('User');
-  // const user = storedUser ? JSON.parse(storedUser) : null;
-  
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -102,7 +99,7 @@ export const FileUploadSystem: React.FC<Id> = ({ parentId }) => {
         open={isDialogOpen}
         files={selectedFiles}
         onClose={handleDialogClose}
-        onConfirm={(files, shouldUpload) =>
+        onConfirm={(files, shouldUpload, descriptions) =>
           handleConfirmation(
             files,
             shouldUpload,
@@ -110,12 +107,13 @@ export const FileUploadSystem: React.FC<Id> = ({ parentId }) => {
             dispatch,
             setUploadProgress,
             setIsDialogOpen,
-            setSelectedFiles
+            setSelectedFiles,
+            descriptions
           )
         }
-        
         uploadProgress={uploadProgress}
       />
+
     </Box>
   );
 };

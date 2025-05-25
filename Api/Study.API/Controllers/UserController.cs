@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Study.API.Models;
 using Study.Core.DTOs;
@@ -54,6 +55,7 @@ namespace Study.API.Controllers
 
         // PUT api/User/5
         [HttpPut("{id}")]
+
         public async Task<ActionResult> Put(int id, [FromBody] UserPostModel user)
         {
             if (user == null || id < 0) return BadRequest("Invalid input");
@@ -65,6 +67,7 @@ namespace Study.API.Controllers
 
         // DELETE api/User/5
         [HttpDelete("{id}")]
+
         public async Task<ActionResult<bool>> DeleteAsync(int id)
         {
             if (id < 0) return BadRequest("Invalid input");
@@ -74,6 +77,7 @@ namespace Study.API.Controllers
 
         }
         [HttpGet("by-email/{email}")]
+        [Authorize(Policy = "AdminOnly")]
         public ActionResult<User> GetByEmail(string email)
         {
             if (string.IsNullOrEmpty(email)) return BadRequest();
@@ -81,12 +85,6 @@ namespace Study.API.Controllers
             if (result == null) return NotFound();
             return Ok(result);
         }
-        //[HttpGet("user-registration-growth")]
-        //public ActionResult<IEnumerable<UserGrowthDTO>> GetUserGrowthByMonth()
-        //{
-        //    var userGrowthData = _userService.GetUserGrowthByMonth();
-        //    return Ok(userGrowthData);
-        //}
 
 
     }

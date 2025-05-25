@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Study.Data.Repository
 {
-    public class TranscriptRepository : IRepository<Transcript>
+    public class TranscriptRepository : ITranscriptRepository
     {
         readonly DataContext _datacontext;
 
@@ -24,9 +24,9 @@ namespace Study.Data.Repository
 
         public async Task<Transcript> AddAsync(Transcript transcript)
         {
-                _datacontext.TranscriptList.Add(transcript);
-                return transcript;
-            
+            _datacontext.TranscriptList.Add(transcript);
+            return transcript;
+
         }
 
         public async Task<Transcript?> GetByIdAsync(int id)
@@ -38,6 +38,12 @@ namespace Study.Data.Repository
         {
             return _datacontext.TranscriptList.ToList().FindIndex(t => t.Id == id);
         }
+        public async Task<Transcript> GetTranscriptByLessonIdAsync(int lessonId)
+        {
+            return await _datacontext.TranscriptList
+                .FirstOrDefaultAsync(t => t.LessonId == lessonId);
+        }
+
 
         public async Task<Transcript> UpdateAsync(Transcript transcript, int id)
         {
@@ -51,20 +57,20 @@ namespace Study.Data.Repository
             existingTranscript.UpdateBy = transcript.UpdateBy;
             existingTranscript.UpdateAt = DateTime.Now;
 
-            
-                return transcript;
-            
-           
+
+            return transcript;
+
+
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
             var transcript = _datacontext.TranscriptList.FirstOrDefault(c => c.Id == id);
             if (transcript == null) return false;
-            
-                _datacontext.TranscriptList.Remove(transcript);
+
+            _datacontext.TranscriptList.Remove(transcript);
             return true;
-          
+
         }
     }
 }

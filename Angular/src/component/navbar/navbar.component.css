@@ -1,0 +1,53 @@
+.mat-toolbar {
+  background: black !important;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  direction: rtl;
+}
+
+/* לוגו */
+.branding-text {
+  color: #20c997;
+  font-weight: 800;
+  font-size: 22px;
+}
+
+/* תפריט */
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 30px; /* רווחים גדולים יותר */
+}
+
+.menu-item {
+  color: #20c997;
+  text-decoration: none;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.3s;
+}
+
+.menu-item:hover {
+  color: #12977b;
+}
+
+.menu-item mat-icon {
+  color: #20c997;
+  transition: color 0.3s;
+}
+
+.menu-item:hover mat-icon {
+  color: #12977b;
+}
+
+/* מפריד בין פריטים */
+.separator {
+  height: 25px;
+  border-right: 2px solid #20c997;
+  margin: 0 15px;
+}

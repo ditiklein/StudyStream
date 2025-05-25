@@ -1,4 +1,3 @@
-
 import { Box, Button, Typography, Container, Grid, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import FacebookIcon from '@mui/icons-material/Facebook';
@@ -40,34 +39,9 @@ const Footer = () => {
     <GradientBox>
       <Container maxWidth="lg">
         <Grid container justifyContent="space-between" alignItems="center" spacing={4}>
+          {/* כאן החלפתי בין צד שמאל לצד ימין */}
           <Grid item xs={12} md={6}>
-            <Box display="flex" flexDirection="column" alignItems="flex-end">
-              <Typography variant="h4" fontWeight="bold" gutterBottom>
-                התחל ללמוד עוד היום
-              </Typography>
-              <Typography variant="body1" sx={{ opacity: 0.9, mb: 2 }}>
-                גלה את הקורסים המובילים שלנו ופתח את הפוטנציאל שלך
-              </Typography>
-              <RoundedButton variant="contained"  size="large">
-                הצטרף עכשיו
-              </RoundedButton>
-            </Box>
-          </Grid>
-          
-          <Grid item xs={12} md={6}>
-            <Box display="flex" justifyContent={{ xs: 'center', md: 'flex-start' }} alignItems="center">
-              <RoundedButton 
-                variant="contained" 
-                sx={{ 
-                  backgroundColor: 'white', 
-                  color: '#7e57c2',
-                  '&:hover': { backgroundColor: '#f5f5f5' },
-                  mr: 3
-                }}
-              >
-                צור קשר
-              </RoundedButton>
-              
+            <Box display="flex" justifyContent={{ xs: 'center', md: 'flex-end' }} alignItems="center">
               <Box>
                 <SocialIconButton aria-label="facebook">
                   <FacebookIcon />
@@ -79,6 +53,34 @@ const Footer = () => {
                   <LinkedInIcon />
                 </SocialIconButton>
               </Box>
+              
+              <RoundedButton 
+                variant="contained" 
+                sx={{ 
+                  backgroundColor: 'white', 
+                  color: '#7e57c2',
+                  '&:hover': { backgroundColor: '#f5f5f5' },
+                  ml: 3 // שיניתי מ-mr ל-ml
+                }}
+              >
+                צור קשר
+              </RoundedButton>
+            </Box>
+          </Grid>
+          
+          <Grid item xs={12} md={6}>
+            <Box display="flex" flexDirection="column" alignItems="flex-end"> {/* שיניתי מ-flex-end ל-flex-start */}
+              <Typography variant="h4" fontWeight="bold" gutterBottom>
+                התחל ללמוד עוד היום
+              </Typography>
+              <Typography variant="body1" sx={{ opacity: 0.9, mb: 2 }}>
+                גלה את הקורסים המובילים שלנו ופתח את הפוטנציאל שלך
+              </Typography>
+              <RoundedButton variant="contained" size="large" href="/register"
+              
+>
+                הצטרף עכשיו
+              </RoundedButton>
             </Box>
           </Grid>
         </Grid>

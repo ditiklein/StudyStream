@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Study.API.Models;
 using Study.Core.DTOs;
@@ -100,12 +101,7 @@ namespace Study.API.Controllers
 
             return Ok(subFolders);
         }
-        [HttpGet("search")]
-        public async Task<ActionResult<List<FolderDTO>>> SearchFoldersAsync([FromQuery] string searchTerm)
-        {
-            var folders = await _folderService.SearchFoldersAsync(searchTerm);
-            return Ok(folders);
-        }
+
         [HttpGet("folders/{userId}")]
         public async Task<ActionResult<IEnumerable<FolderDTO>>> GetUserFolders(int userId)
         {
@@ -117,7 +113,16 @@ namespace Study.API.Controllers
 
             return Ok(folders);
         }
-
+        [HttpGet("search-folders")]
+        public async Task<IActionResult> SearchFolders(
+            [FromQuery] int userId,
+            [FromQuery] int? folderId, // שינוי סוג הפרמטר ל-int? כדי לתמוך ב-null
+            [FromQuery] string query)
+        {
+            Console.WriteLine($"userId: {userId}, currentFolderId: {folderId}, query: {query}");
+            var folders = await _folderService.SearchFoldersAsync(userId, folderId, query);
+            return Ok(folders);
+        }
 
     }
 

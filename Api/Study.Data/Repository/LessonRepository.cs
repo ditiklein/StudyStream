@@ -25,7 +25,9 @@ namespace Study.Data.Repository
                 .ToListAsync();
         }
         public async Task<Lesson> AddAsync(Lesson lesson)
+
         {
+            lesson.UrlName = lesson.LessonName;
             _datacontext.LessonList.Add(lesson);
             return lesson;
 
@@ -42,11 +44,11 @@ namespace Study.Data.Repository
             var existingLesson = _datacontext.LessonList.FirstOrDefault(c => c.Id == id);
             if (existingLesson == null) return null;
             existingLesson.OwnerId = lesson.OwnerId;
-            existingLesson.LessonName = lesson.LessonName;
-            existingLesson.Url = lesson.Url;
+            existingLesson.UrlName = lesson.LessonName;
             existingLesson.FolderId = lesson.FolderId;
             existingLesson.FileType = lesson.FileType;
             existingLesson.UpdatedAt = DateTime.Now;
+            existingLesson.IsDeleted = lesson.IsDeleted;
 
 
 
@@ -67,6 +69,17 @@ namespace Study.Data.Repository
 
                 return true;
             
+
+        }
+        public async Task<bool> DeleteHardAsync(int id)
+        {
+            var lesson = _datacontext.LessonList.FirstOrDefault(c => c.Id == id);
+
+            if (lesson == null) return false;
+            _datacontext.LessonList.Remove(lesson);
+
+            return true;
+
 
         }
         public async Task<IEnumerable<Lesson>> GetFilesInFolderAsync(int folderId)
@@ -105,7 +118,59 @@ namespace Study.Data.Repository
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Lesson>> GetDeletedLessonsByOwnerIdAsync(int ownerId)
+        {
+            return await _datacontext.LessonList
+                .Where(l => l.OwnerId == ownerId && l.IsDeleted == true)
+                .ToListAsync();
+        }
+        public List<Lesson> GetFilesRecursively(int folderId)
+        {
+            var allFolders = _datacontext.FolderList.ToList(); // טוען את כל התיקיות לזיכרון
+            var allLessons = _datacontext.LessonList.ToList(); // טוען את כל הקבצים לזיכרון
 
+            var folderIds = GetAllSubFolderIds(folderId, allFolders);
+
+            return allLessons
+                .Where(l => l.FolderId.HasValue && folderIds.Contains(l.FolderId.Value))
+                .ToList();
+        }
+        public List<int> GetAllSubFolderIds(int folderId, List<Folder> allFolders)
+        {
+            var folderIds = new List<int> { folderId };
+
+            var subFolders = allFolders.Where(f => f.ParentFolderId == folderId).ToList();
+
+            foreach (var folder in subFolders)
+            {
+                folderIds.AddRange(GetAllSubFolderIds(folder.Id, allFolders)); // קריאה רקורסיבית
+            }
+
+            return folderIds;
+        }
+
+        public async Task<List<Lesson>> SearchFilesAsync(int userId, int currentFolderId, string query)
+        {
+            return await Task.Run(() => GetFilesRecursively(currentFolderId)
+                .Where(f => f.OwnerId == userId && f.LessonName.Contains(query))
+                .ToList());
+        }
+        public async Task<IEnumerable<Lesson>> GetLessonsWithTranscriptAsync()
+        {
+            return await _datacontext.LessonList
+                .Where(l => l.Transcript != null && !l.IsDeleted)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Lesson>> GetLessonsWithoutTranscriptAsync()
+        {
+            return await _datacontext.LessonList
+                .Where(l => l.Transcript == null && !l.IsDeleted)
+                .ToListAsync();
+        }
 
     }
+
+
+
 }

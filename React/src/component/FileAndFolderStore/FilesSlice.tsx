@@ -1,11 +1,14 @@
 import { 
    createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosError } from "axios";
+import  { AxiosError } from "axios";
 import { Rootstore } from "./FileStore";
+import api from "./Api";
 
 // 🔹 שליפת תיקיות ראשיות (תיקיות ללא תיקיית אב)
 const fetchData = async (urls: string[]) => {
-  const results = await Promise.allSettled(urls.map(url => axios.get(url)));
+console.log(urls);
+
+  const results = await Promise.allSettled(urls.map(url => api.get(url)));
   return results.map(result => result.status === "fulfilled" ? result.value.data : []);
 };
 
@@ -16,7 +19,7 @@ export const fetchUserFolders = createAsyncThunk(
   "folders/fetchUserFolders",
   async (ownerId: number, thunkAPI) => {
     try {
-      const response = await axios.get(`https://localhost:7147/api/Folder/user/${ownerId}`);
+      const response = await api.get(`/Folder/folders/${ownerId}`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue((error as AxiosError).response?.data || error);
@@ -28,7 +31,7 @@ export const fetchUserFiles = createAsyncThunk(
   "files/fetchUserFiles",
   async (ownerId: number, thunkAPI) => {
     try {
-      const response = await axios.get(`https://localhost:7147/api/Lesson/lessons/user/${ownerId}`);
+      const response = await api.get(`/Lesson/lessons/user/${ownerId}`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue((error as AxiosError).response?.data || error);
@@ -43,8 +46,8 @@ export const fetchRootFolders = createAsyncThunk(
   async (ownerId: number, thunkAPI) => {
     try {
       const [folders, files] = await fetchData([
-        `https://localhost:7147/api/Folder/root/${ownerId}`,
-        `https://localhost:7147/api/Lesson/root/${ownerId}`
+        `/Folder/root/${ownerId}`,
+        `/Lesson/root/${ownerId}`
       ]);
       return { folders, files };
     } catch (error) {
@@ -61,8 +64,8 @@ export const fetchSubFoldersAndFiles = createAsyncThunk(
   ) => {
     try {
       const [folders, files] = await fetchData([
-        `https://localhost:7147/api/Folder/subfolders/${parentFolderId}/user/${ownerId}`,
-        `https://localhost:7147/api/Lesson/lessons/${parentFolderId}`
+        `/Folder/subfolders/${parentFolderId}/user/${ownerId}`,
+        `/Lesson/lessons/${parentFolderId}`
       ]);
       return { folders, files };
     } catch (error) {
@@ -76,7 +79,7 @@ export const addFolder = createAsyncThunk(
   "folders/addFolder",
   async ({ name, ownerId, parentFolderId }: { name: string; ownerId: number; parentFolderId: number | null }, thunkAPI) => {
     try {
-      const response = await axios.post("https://localhost:7147/api/Folder", {
+      const response = await api.post("/Folder", {
         name,
         ownerId,
         parentFolderId: parentFolderId ?? null, // אם אין הורה, שולחים null
@@ -93,13 +96,13 @@ export const addFolder = createAsyncThunk(
 // 🔹 הוספת קובץ
 export const addFile = createAsyncThunk(
   "folders/addFile",
-  async ({ lessonName, ownerId, fileType, url, folderId }: { lessonName: string; ownerId: number; fileType: string; url: string; folderId: number | null }, thunkAPI) => {
+  async ({ lessonName,description, ownerId, fileType, folderId }: { lessonName: string;description:string; ownerId: number; fileType: string; folderId: number | null }, thunkAPI) => {
     try {
-      const response = await axios.post("https://localhost:7147/api/Lesson", {
+      const response = await api.post("/Lesson", {
         lessonName,
+        description,
         ownerId,
         fileType,
-        url,
         folderId: folderId ?? null, // אם אין הורה, שולחים null
       });
       return response.data; // מחזירים את הקובץ החדש שנוצר
@@ -120,8 +123,8 @@ export const updateFolder = createAsyncThunk(
     try {
       console.log(id, name, ownerId ,parentFolderId);
       
-      const response = await axios.put(
-        `https://localhost:7147/api/Folder/${id}`,
+      const response = await api.put(
+        `/Folder/${id}`,
         {
           name,
           ownerId,
@@ -143,7 +146,7 @@ export const deleteFolder = createAsyncThunk(
   "folders/deleteFolder",
   async (id: number, thunkAPI) => {
     try {
-      await axios.delete(`https://localhost:7147/api/Folder/${id}`);
+      await api.delete(`/Folder/${id}`);
       return { id }; // מחזירים את ה-ID של התיקייה שנמחקה
     } catch (error) {
       const err = error as AxiosError;
@@ -155,16 +158,17 @@ export const deleteFolder = createAsyncThunk(
 // 🔹 עדכון קובץ
 export const updateFile = createAsyncThunk(
   "files/updateFile",
-  async ({ id, lessonName, ownerId,folderId, fileType, url }: { id: number; lessonName: string; ownerId: number;folderId:number|null; fileType: string; url: string }, thunkAPI) => {
+  async ({ id, lessonName, ownerId,folderId, fileType, url,isDeleted }: { id: number; lessonName: string; ownerId: number;folderId:number|null; fileType: string; url: string,isDeleted:boolean }, thunkAPI) => {
     try {
-      const response = await axios.put(
-        `https://localhost:7147/api/Lesson/${id}`,
+      const response = await api.put(
+        `/Lesson/${id}`,
         {
           lessonName,
           ownerId,
           folderId,
           fileType,
           url,
+          isDeleted
         }
       );
       return response.data; // מחזירים את הקובץ לאחר העדכון
@@ -180,11 +184,104 @@ export const deleteFile = createAsyncThunk(
   "files/deleteFile",
   async (id: number, thunkAPI) => {
     try {
-  await axios.delete(`https://localhost:7147/api/Lesson/${id}`);
+  await api.delete(`/Lesson/${id}`);
       return { id }; // מחזירים את ה-ID של הקובץ שנמחק
     } catch (error) {
       const err = error as AxiosError;
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+export const hardDeleteFile = createAsyncThunk(
+  "files/hardDeleteFile",
+  async (id: number, thunkAPI) => {
+    try {
+      await api.delete(`Lesson/harddelete/${id}`); // קריאה ל-API שמבצע מחיקה קשה
+      return { id }; // מחזירים את ה-ID של הקובץ שנמחק
+    } catch (error) {
+      const err = error as AxiosError;
+      return thunkAPI.rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+// export const searchFolders = createAsyncThunk(
+//   "folders/searchFolders",
+//   async (
+//     { userId, currentFolderId, query }: { userId: number; currentFolderId: number|null; query: string },
+//     thunkAPI
+//   ) => {
+//     try {
+      
+//       console.log("userId, currentFolderId, query"+userId, currentFolderId, query);
+      
+//       const response = await api.get(`/Folder/search-folders/?userId=${userId}&folderId=${currentFolderId}&query=${query}`);
+       
+//       return response.data; // מחזירים את התוצאות מהחיפוש
+//     } catch (error) {
+//       console.log("error folder");
+      
+//       return thunkAPI.rejectWithValue((error as AxiosError).response?.data || error);
+//     }
+//   }
+// );
+
+// // 🔹 חיפוש קבצים
+// export const searchFiles = createAsyncThunk(
+//   "files/searchFiles",
+//   async (
+//     { userId, currentFolderId, query }: { userId: number; currentFolderId: number|null; query: string },
+//     thunkAPI
+//   ) => {
+//     try {
+      
+//       const response = await api.get(`/Lesson/search-files/?userId=${userId}&folderId=${currentFolderId}&query=${query}`);
+//       return response.data; // מחזירים את התוצאות מהחיפוש
+//     } catch (error) {
+//       console.log("errrrrr");
+      
+//       return thunkAPI.rejectWithValue((error as AxiosError).response?.data || error);
+//     }
+//   }
+// );
+export const searchFolders = createAsyncThunk(
+  "folders/searchFolders",
+  async (
+    { userId, currentFolderId, query }: { userId: number; currentFolderId: number|null; query: string },
+    thunkAPI
+  ) => {
+    try {
+      // בדיקה אם currentFolderId הוא null ובניית ה-URL בהתאם
+      const url = currentFolderId === null 
+        ? `/Folder/search-folders/?userId=${userId}&query=${query}` 
+        : `/Folder/search-folders/?userId=${userId}&folderId=${currentFolderId}&query=${query}`;
+      
+      const response = await api.get(url);
+      return response.data;
+    } catch (error) {
+      console.log("error folder");
+      return thunkAPI.rejectWithValue((error as AxiosError).response?.data || error);
+    }
+  }
+);
+
+export const searchFiles = createAsyncThunk(
+  "files/searchFiles",
+  async (
+    { userId, currentFolderId, query }: { userId: number; currentFolderId: number|null; query: string },
+    thunkAPI
+  ) => {
+    try {
+      // בדיקה אם currentFolderId הוא null ובניית ה-URL בהתאם
+      const url = currentFolderId === null 
+        ? `/Lesson/search-files/?userId=${userId}&query=${query}` 
+        : `/Lesson/search-files/?userId=${userId}&folderId=${currentFolderId}&query=${query}`;
+      
+      const response = await api.get(url);
+      return response.data;
+    } catch (error) {
+      console.log("errrrrr");
+      return thunkAPI.rejectWithValue((error as AxiosError).response?.data || error);
     }
   }
 );
@@ -196,6 +293,9 @@ const FilesSlice = createSlice({
     files: [] as any[], 
     allUserFolders: [] as any[],
     allUserFiles: [] as any[],
+    searchFoldersResults: [] as any[], // תוצאות חיפוש תיקיות
+    searchFilesResults: [] as any[], // תוצאות חיפוש קבצים
+
     loading: false, // מצב טעינה
     error: null as string | null, // הודעת שגיאה במידה ויש
   },
@@ -212,6 +312,7 @@ const FilesSlice = createSlice({
         state.loading = false;
         state.folders = action.payload.folders;
         state.files = action.payload.files;
+        
       })
       .addCase(fetchRootFolders.rejected, (state, action) => {
         state.loading = false;
@@ -318,7 +419,8 @@ const FilesSlice = createSlice({
       })
       .addCase(updateFile.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        const updatedFile = action.payload;
+        console.log("ssssss");
+                const updatedFile = action.payload;
         const index = state.files.findIndex((file) => file.id === updatedFile.id);
         if (index !== -1) {
           state.files[index] = updatedFile;
@@ -352,7 +454,48 @@ const FilesSlice = createSlice({
       .addCase(fetchUserFiles.rejected, (state, action) => {
         state.loading = false;
         state.error = typeof action.payload === "string" ? action.payload : "Failed to fetch user files";
-      });
+      })
+      .addCase(hardDeleteFile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(hardDeleteFile.fulfilled, (state, action: PayloadAction<{ id: number }>) => {
+        state.loading = false;
+        state.files = state.files.filter((file) => file.id !== action.payload.id); // מסננים את הקובץ שנמחק
+      })
+      .addCase(hardDeleteFile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = typeof action.payload === "string" ? action.payload : "Failed to hard delete file";
+      })
+      .addCase(searchFolders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(searchFolders.fulfilled, (state, action: PayloadAction<any[]>) => {
+        state.loading = false;
+        state.searchFoldersResults = action.payload; // עדכון תוצאות החיפוש
+      })
+      .addCase(searchFolders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = typeof action.payload === "string" ? action.payload : "Failed to search folders";
+      })
+
+      // 🔄 סטטוס טעינה עבור חיפוש קבצים
+      .addCase(searchFiles.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(searchFiles.fulfilled, (state, action: PayloadAction<any[]>) => {
+        state.loading = false;
+        state.searchFilesResults = action.payload; // עדכון תוצאות החיפוש
+      })
+      .addCase(searchFiles.rejected, (state, action) => {
+        state.loading = false;
+        state.error = typeof action.payload === "string" ? action.payload : "Failed to search files";
+      })
+
+      
+
   },
 });
 

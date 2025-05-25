@@ -90,16 +90,18 @@ namespace Study.Services
             return f;
 
         }
-        public async Task<List<FolderDTO>> SearchFoldersAsync(string searchTerm)
-        {
-            var folders = await _folderRepository.SearchFoldersAsync(searchTerm);
-            return _mapper.Map<List<FolderDTO>>(folders); // שימוש ב-Mapper
-        }
         public async Task<IEnumerable<FolderDTO>> GetUserFoldersAsync(int userId)
         {
             var folders = await _folderRepository.GetUserFoldersAsync(userId);
             return _mapper.Map<IEnumerable<FolderDTO>>(folders);
         }
+        public async Task<List<FolderDTO>> SearchFoldersAsync(int userId, int? currentFolderId, string query)
+        {
+            var folders= await _folderRepository.SearchFoldersAsync(userId, currentFolderId, query);
+            return _mapper.Map<List<FolderDTO>>(folders);
+        }
+
+
 
     }
 }

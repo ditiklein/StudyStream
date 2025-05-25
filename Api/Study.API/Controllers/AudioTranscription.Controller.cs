@@ -1,426 +1,107 @@
-﻿//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.AspNetCore.SignalR;
-//using Microsoft.Extensions.Logging;
-//using OpenAI.Managers;
-//using OpenAI;
-//using OpenAI.ObjectModels;
-//using OpenAI.ObjectModels.RequestModels;
-//using System;
-//using System.IO;
-//using System.Threading.Tasks;
-//using NAudio.Wave;
-//using Microsoft.AspNetCore.Http;
-//using System.Text.Json;
-
-//[ApiController]
-//[Route("api/[controller]")]
-//public class AudioTranscriptionController : ControllerBase
-//{
-//    private readonly IHubContext<TranscriptionHub> _hubContext;
-//    private readonly OpenAIService _openAIService;
-//    private readonly ILogger<AudioTranscriptionController> _logger;
-
-//    public AudioTranscriptionController(
-//        IHubContext<TranscriptionHub> hubContext,
-//        OpenAIService openAIService,
-//        ILogger<AudioTranscriptionController> logger)
-//    {
-//        _hubContext = hubContext;
-//        _openAIService = openAIService;
-//        _logger = logger;
-//    }
-
-//    [HttpPost("upload")]
-//    public async Task<IActionResult> UploadAudio(
-//        IFormFile audioFile,
-//        [FromQuery] string connectionId)
-//    {
-//        if (audioFile == null || audioFile.Length == 0)
-//            return BadRequest("אין קובץ שמע");
-
-//        if (string.IsNullOrEmpty(connectionId))
-//            return BadRequest("חסר מזהה חיבור");
-
-//        try
-//        {
-//            _logger.LogInformation($"מתחיל תמלול עבור חיבור: {connectionId}");
-
-//            // יצירת תיקייה זמנית אם אינה קיימת
-//            var tempDir = Path.Combine(Directory.GetCurrentDirectory(), "TempAudio");
-//            Directory.CreateDirectory(tempDir);
-
-//            // שמירת קובץ זמני
-//            var tempFilePath = Path.Combine(tempDir, Guid.NewGuid().ToString() + Path.GetExtension(audioFile.FileName));
-//            using (var fileStream = new FileStream(tempFilePath, FileMode.Create))
-//            {
-//                await audioFile.CopyToAsync(fileStream);
-//            }
-
-//            // התחלת התמלול בתהליך נפרד
-//            _ = TranscribeAudioAsync(tempFilePath, connectionId);
-
-//            return Ok(new { message = "הקובץ נשלח לתמלול", connectionId = connectionId });
-//        }
-//        catch (Exception ex)
-//        {
-//            _logger.LogError(ex, "שגיאה בעיבוד העלאת האודיו");
-//            return StatusCode(500, $"שגיאה: {ex.Message}");
-//        }
-//    }
-
-//    private async Task TranscribeAudioAsync(string audioFilePath, string connectionId)
-//    {
-//        try
-//        {
-//            await _hubContext.Clients.Client(connectionId).SendAsync(
-//                "TranscriptionStatus", "התחלת תמלול...");
-
-//            // ממירים ל-WAV אם צריך
-//            var wavFilePath = Path.ChangeExtension(audioFilePath, "wav");
-//            ConvertToWav(audioFilePath, wavFilePath);
-
-//            // תמלול עם OpenAI Whisper
-//            using (var fileStream = new FileStream(wavFilePath, FileMode.Open))
-//            {
-//                // המרת FileStream לבייטים
-//                byte[] fileBytes;
-//                using (var memoryStream = new MemoryStream())
-//                {
-//                    await fileStream.CopyToAsync(memoryStream);
-//                    fileBytes = memoryStream.ToArray();
-//                }
-
-//                var transcriptionRequest = new AudioCreateTranscriptionRequest
-//                {
-//                    Model = Models.WhisperV1,
-//                    File = fileBytes,
-//                    Language = "he", // עברית
-//                    ResponseFormat = "json"
-//                };
-
-//                var result = await _openAIService.Audio.CreateTranscription(transcriptionRequest);
-
-//                if (result.Successful)
-//                {
-//                    var resultText = string.Empty;
-
-//                    try
-//                    {
-//                        // בהנחה שהחבילה מחזירה Text כמאפיין
-//                        resultText = result.Text;
-
-//                        // במקרה שיש בעיה לגשת ל-Text ישירות
-//                        if (string.IsNullOrEmpty(resultText))
-//                        {
-//                            var resultJson = JsonSerializer.Serialize(result);
-//                            var responseObj = JsonSerializer.Deserialize<JsonElement>(resultJson);
-
-//                            if (responseObj.TryGetProperty("text", out JsonElement textElement))
-//                            {
-//                                resultText = textElement.GetString();
-//                            }
-//                        }
-
-//                        // שליחת תוצאה ללקוח
-//                        if (!string.IsNullOrEmpty(resultText))
-//                        {
-//                            foreach (var segment in resultText.Split('\n'))
-//                            {
-//                                if (!string.IsNullOrWhiteSpace(segment))
-//                                {
-//                                    await _hubContext.Clients.Client(connectionId).SendAsync(
-//                                        "ReceiveTranscription", new { text = segment });
-//                                }
-//                            }
-
-//                            await _hubContext.Clients.Client(connectionId).SendAsync(
-//                                "TranscriptionComplete", "התמלול הושלם בהצלחה");
-//                        }
-//                        else
-//                        {
-//                            await _hubContext.Clients.Client(connectionId).SendAsync(
-//                                "TranscriptionError", "לא התקבל טקסט מהתמלול");
-//                        }
-//                    }
-//                    catch (Exception ex)
-//                    {
-//                        _logger.LogError(ex, "שגיאה בעיבוד תוצאת התמלול");
-//                        await _hubContext.Clients.Client(connectionId).SendAsync(
-//                            "TranscriptionError", $"שגיאה בעיבוד תוצאות התמלול: {ex.Message}");
-//                    }
-//                }
-//                else
-//                {
-//                    _logger.LogError("שגיאת OpenAI API: {Error}", result.Error?.Message);
-//                    await _hubContext.Clients.Client(connectionId).SendAsync(
-//                        "TranscriptionError", $"שגיאה בתמלול: {result.Error?.Message}");
-//                }
-//            }
-
-//            // ניקוי קבצים זמניים
-//            if (System.IO.File.Exists(audioFilePath))
-//                System.IO.File.Delete(audioFilePath);
-
-//            if (System.IO.File.Exists(wavFilePath))
-//                System.IO.File.Delete(wavFilePath);
-//        }
-//        catch (Exception ex)
-//        {
-//            _logger.LogError(ex, "שגיאה בתהליך התמלול");
-//            await _hubContext.Clients.Client(connectionId).SendAsync(
-//                "TranscriptionError", $"שגיאה בתמלול: {ex.Message}");
-//        }
-//    }
-
-//    private void ConvertToWav(string inputPath, string outputPath)
-//{
-//    try
-//    {
-//        if (string.IsNullOrEmpty(inputPath))
-//        {
-//            throw new ArgumentNullException(nameof(inputPath), "נתיב קובץ הקלט ריק");
-//        }
-
-//        if (!System.IO.File.Exists(inputPath))
-//        {
-//            throw new FileNotFoundException("קובץ הקלט לא נמצא", inputPath);
-//        }
-
-//        using (var reader = new MediaFoundationReader(inputPath))
-//        {
-//            WaveFileWriter.CreateWaveFile(outputPath, reader);
-//        }
-//    }
-//    catch (Exception ex)
-//    {
-//        _logger.LogError(ex, $"שגיאה בהמרת אודיו ל-WAV. נתיב קלט: {inputPath}, נתיב פלט: {outputPath}");
-//        throw new Exception($"שגיאה בהמרת קובץ השמע: {ex.Message}", ex);
-//    }
-//}
-
-//}
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
-using OpenAI.Managers;
-using OpenAI.ObjectModels;
-using OpenAI.ObjectModels.RequestModels;
+﻿
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using NAudio.Wave;
 using Microsoft.AspNetCore.Http;
-using System.Text.Json;
-using OpenAI.ObjectModels.RequestModels;
-using OpenAI.ObjectModels;
-using OpenAI;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
-
-[ApiController]
-[Route("api/[controller]")]
-public class AudioTranscriptionController : ControllerBase
+namespace YourNamespace
 {
-    private readonly IHubContext<TranscriptionHub> _hubContext;
-    private readonly OpenAIService _openAIService;
-    private readonly ILogger<AudioTranscriptionController> _logger;
-
-    public AudioTranscriptionController(
-        IHubContext<TranscriptionHub> hubContext,
-        OpenAIService openAIService,
-        ILogger<AudioTranscriptionController> logger)
+    [ApiController]
+    [Route("api/transcription")]
+    public class TranscriptionController : ControllerBase
     {
-        _hubContext = hubContext;
-        _openAIService = openAIService;
-        _logger = logger;
-    }
+        private readonly ILogger<TranscriptionController> _logger;
+        private readonly TranscriptionSe _transcriptionService;
 
-    [HttpPost("upload")]
-    public async Task<IActionResult> UploadAudio(
-        IFormFile audioFile,
-        [FromQuery] string connectionId)
-    {
-        if (audioFile == null || audioFile.Length == 0)
-            return BadRequest("אין קובץ שמע");
-
-        if (string.IsNullOrEmpty(connectionId))
-            return BadRequest("חסר מזהה חיבור");
-
-        try
+        public TranscriptionController(
+            ILogger<TranscriptionController> logger,
+            TranscriptionSe transcriptionService)
         {
-            _logger.LogInformation($"מתחיל תמלול עבור חיבור: {connectionId}");
-
-            // יצירת תיקייה זמנית אם אינה קיימת
-            var tempDir = Path.Combine(Directory.GetCurrentDirectory(), "TempAudio");
-            Directory.CreateDirectory(tempDir);
-
-            // שמירת קובץ זמני
-            var tempFilePath = Path.Combine(tempDir, Guid.NewGuid().ToString() + Path.GetExtension(audioFile.FileName));
-            using (var fileStream = new FileStream(tempFilePath, FileMode.Create))
-            {
-                await audioFile.CopyToAsync(fileStream);
-            }
-
-            // התחלת התמלול בתהליך נפרד
-            _ = TranscribeAudioAsync(tempFilePath, connectionId, audioFile.FileName); // שליחת שם הקובץ המקורי
-
-            return Ok(new { message = "הקובץ נשלח לתמלול", connectionId = connectionId });
+            _logger = logger;
+            _transcriptionService = transcriptionService;
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "שגיאה בעיבוד העלאת האודיו");
-            return StatusCode(500, $"שגיאה: {ex.Message}");
-        }
-    }
 
-    private async Task TranscribeAudioAsync(string audioFilePath, string connectionId, string originalFileName)
-    {
-        try
+        [HttpPost("transcribe-full")]
+        public async Task<IActionResult> TranscribeFull(IFormFile file)
         {
-            if (string.IsNullOrEmpty(audioFilePath))
+            _logger.LogInformation($"Received transcription request for file: {file?.FileName ?? "null"}");
+
+            if (file == null || file.Length == 0)
             {
-                await _hubContext.Clients.Client(connectionId).SendAsync(
-                    "TranscriptionError", "שגיאה: נתיב קובץ האודיו ריק");
-                return;
+                _logger.LogWarning("No file uploaded or file is empty");
+                return BadRequest("No file uploaded or file is empty");
             }
 
-            if (!System.IO.File.Exists(audioFilePath))
+            try
             {
-                await _hubContext.Clients.Client(connectionId).SendAsync(
-                    "TranscriptionError", $"שגיאה: קובץ האודיו לא נמצא בנתיב {audioFilePath}");
-                return;
-            }
+                // בדיקת סוג הקובץ
+                string extension = Path.GetExtension(file.FileName).ToLower();
+                string[] allowedExtensions = { ".mp3", ".wav", ".m4a", ".ogg", ".flac" };
 
-            await _hubContext.Clients.Client(connectionId).SendAsync(
-                "TranscriptionStatus", "התחלת תמלול...");
-
-            // ממירים ל-WAV אם צריך
-            var wavFilePath = Path.ChangeExtension(audioFilePath, "wav");
-            ConvertToWav(audioFilePath, wavFilePath);
-
-            // תמלול עם OpenAI Whisper
-            using (var fileStream = new FileStream(wavFilePath, FileMode.Open))
-            {
-                // המרת FileStream לבייטים
-                byte[] fileBytes;
-                using (var memoryStream = new MemoryStream())
+                if (Array.IndexOf(allowedExtensions, extension) == -1)
                 {
-                    await fileStream.CopyToAsync(memoryStream);
-                    fileBytes = memoryStream.ToArray();
+                    _logger.LogWarning($"Invalid file type: {extension}");
+                    return BadRequest($"Invalid file type. Allowed types: {string.Join(", ", allowedExtensions)}");
                 }
 
-                var transcriptionRequest = new AudioCreateTranscriptionRequest
+                // בדיקת גודל הקובץ
+                if (file.Length > 25 * 1024 * 1024) // 25MB
                 {
-                    Model = Models.WhisperV1,
-                    File = fileBytes,
-                    FileName = originalFileName, // שימוש בשם הקובץ המקורי
-                    Language = "he",
-                    ResponseFormat = "json"
-                };
-
-                var result = await _openAIService.Audio.CreateTranscription(transcriptionRequest);
-
-                if (result.Successful)
-                {
-                    var resultText = string.Empty;
-
-                    try
-                    {
-                        // בהנחה שהחבילה מחזירה Text כמאפיין
-                        resultText = result.Text;
-
-                        // במקרה שיש בעיה לגשת ל-Text ישירות
-                        if (string.IsNullOrEmpty(resultText))
-                        {
-                            var resultJson = JsonSerializer.Serialize(result);
-                            var responseObj = JsonSerializer.Deserialize<JsonElement>(resultJson);
-
-                            if (responseObj.TryGetProperty("text", out JsonElement textElement))
-                            {
-                                resultText = textElement.GetString();
-                            }
-                        }
-
-                        // שליחת תוצאה ללקוח
-                        if (!string.IsNullOrEmpty(resultText))
-                        {
-                            foreach (var segment in resultText.Split('\n'))
-                            {
-                                if (!string.IsNullOrWhiteSpace(segment))
-                                {
-                                    await _hubContext.Clients.Client(connectionId).SendAsync(
-                                        "ReceiveTranscription", new { text = segment });
-                                }
-                            }
-
-                            await _hubContext.Clients.Client(connectionId).SendAsync(
-                                "TranscriptionComplete", "התמלול הושלם בהצלחה");
-                        }
-                        else
-                        {
-                            await _hubContext.Clients.Client(connectionId).SendAsync(
-                                "TranscriptionError", "לא התקבל טקסט מהתמלול");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "שגיאה בעיבוד תוצאת התמלול");
-                        await _hubContext.Clients.Client(connectionId).SendAsync(
-                            "TranscriptionError", $"שגיאה בעיבוד תוצאות התמלול: {ex.Message}");
-                    }
+                    _logger.LogWarning($"File too large: {file.Length / (1024 * 1024)}MB");
+                    return BadRequest("File size exceeds the 25MB limit");
                 }
-                else
+
+                // יצירת תיקיית temp אם לא קיימת
+                var tempDir = Path.Combine(Path.GetTempPath(), "AudioTranscriptions");
+                if (!Directory.Exists(tempDir))
                 {
-                    _logger.LogError("שגיאת OpenAI API: {Error}", result.Error?.Message);
-                    await _hubContext.Clients.Client(connectionId).SendAsync(
-                        "TranscriptionError", $"שגיאה בתמלול: {result.Error?.Message}");
+                    Directory.CreateDirectory(tempDir);
                 }
+
+                // שמירת הקובץ
+                var fileName = $"{Guid.NewGuid()}{extension}";
+                var filePath = Path.Combine(tempDir, fileName);
+
+                _logger.LogInformation($"Saving uploaded file to: {filePath}");
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // וידוא שהקובץ נשמר בהצלחה
+                if (!System.IO.File.Exists(filePath))
+                {
+                    _logger.LogError($"Failed to save file to: {filePath}");
+                    return StatusCode(500, "Failed to save uploaded file");
+                }
+
+                // קריאה לשירות התמלול
+                _logger.LogInformation("Calling transcription service");
+                var transcriptionResult = await _transcriptionService.TranscribeAudioFullAsync(filePath);
+
+                // מחיקת הקובץ הזמני
+                try
+                {
+                    System.IO.File.Delete(filePath);
+                    _logger.LogInformation($"Deleted temporary file: {filePath}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, $"Failed to delete temporary file: {filePath}");
+                    // לא נחזיר שגיאה למשתמש אם לא הצלחנו למחוק את הקובץ הזמני
+                }
+
+                _logger.LogInformation("Transcription completed successfully");
+                return Ok(new { text = transcriptionResult });
             }
-
-            // ניקוי קבצים זמניים
-            if (System.IO.File.Exists(audioFilePath))
-                System.IO.File.Delete(audioFilePath);
-
-            if (System.IO.File.Exists(wavFilePath))
-                System.IO.File.Delete(wavFilePath);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "שגיאה בתהליך התמלול");
-            await _hubContext.Clients.Client(connectionId).SendAsync(
-                "TranscriptionError", $"שגיאה בתמלול: {ex.Message}");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error transcribing audio");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
-       private void ConvertToWav(string inputPath, string outputPath)
-    {
-        try
-        {
-            if (string.IsNullOrEmpty(inputPath))
-            {
-                throw new ArgumentNullException(nameof(inputPath), "נתיב קובץ הקלט ריק");
-            }
-
-            if (!System.IO.File.Exists(inputPath))
-            {
-                throw new FileNotFoundException("קובץ הקלט לא נמצא", inputPath);
-            }
-
-            using (var reader = new MediaFoundationReader(inputPath))
-            {
-                WaveFileWriter.CreateWaveFile(outputPath, reader);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"שגיאה בהמרת אודיו ל-WAV. נתיב קלט: {inputPath}, נתיב פלט: {outputPath}");
-            throw new Exception($"שגיאה בהמרת קובץ השמע: {ex.Message}", ex);
-        }
-        }
 }
-
-
-
-
-
-
-
-

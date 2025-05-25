@@ -15,12 +15,12 @@ namespace Study.Service
 
     public class TranscriptService : ITranscriptService
     {
-        readonly IRepository<Transcript> _transcriptRepository;
+        readonly ITranscriptRepository _transcriptRepository;
         readonly IMapper _mapper;
-        readonly IReposiroryManager  _repositoryManager;
+        readonly IReposiroryManager _repositoryManager;
 
 
-        public TranscriptService(IRepository<Transcript> transcriptRepository, IMapper mapper, IReposiroryManager repositoryManager)
+        public TranscriptService(ITranscriptRepository transcriptRepository, IMapper mapper, IReposiroryManager repositoryManager)
         {
             _transcriptRepository = transcriptRepository;
             _mapper = mapper;
@@ -29,15 +29,21 @@ namespace Study.Service
 
         public async Task<IEnumerable<TranscriptDTO>> GetAllTranscriptAsync()
         {
-            var transcripts =await _transcriptRepository.GetAllAsync();
+            var transcripts = await _transcriptRepository.GetAllAsync();
             return _mapper.Map<IEnumerable<TranscriptDTO>>(transcripts);
         }
 
         public async Task<TranscriptDTO> GetTranscriptByIdAsync(int id)
         {
-            var transcript =await _transcriptRepository.GetByIdAsync(id);
+            var transcript = await _transcriptRepository.GetByIdAsync(id);
             return _mapper.Map<TranscriptDTO>(transcript);
         }
+        public async Task<TranscriptDTO> GetTranscriptByLessonIdAsync(int lessonId)
+        {
+            var transcript = await _transcriptRepository.GetTranscriptByLessonIdAsync(lessonId);
+            return transcript != null ? _mapper.Map<TranscriptDTO>(transcript) : null;
+        }
+
 
         public async Task<TranscriptDTO> UpdateTranscriptAsync(int id, TranscriptDTO transcript)
         {
@@ -55,7 +61,7 @@ namespace Study.Service
             if (await GetTranscriptByIdAsync(transcriptDTO.Id) != null)
                 return null;
             var transcript = _mapper.Map<Transcript>(transcriptDTO);
-            Transcript t= await _transcriptRepository.AddAsync(transcript);
+            Transcript t = await _transcriptRepository.AddAsync(transcript);
             await _repositoryManager.SaveAsync();
             var tD = _mapper.Map<TranscriptDTO>(t);
             return tD;

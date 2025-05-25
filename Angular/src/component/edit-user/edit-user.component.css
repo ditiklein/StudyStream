@@ -1,0 +1,209 @@
+mat-card-header {
+  display: flex;
+  justify-content: center;
+  padding: 0;
+}.form-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-card {
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: none; /* הסרת הצל */
+  position: relative;
+  overflow: hidden;
+  background: none; /* הסרת הרקע הלבן */
+}
+
+/* פס תכלת עליון */
+mat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #12977b, #20c997, #12977b);
+  background-size: 200% 100%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.title-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.title-center {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #12977b; /* תכלת כהה */
+  margin: 0 auto 16px;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+/* קו מתחת לכותרת - מתוקן ומרוכז */
+.title-center::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px; /* אורך קבוע */
+  height: 2px;
+  background: #20c997; /* צבע תכלת אחיד */
+}
+
+/* עיצוב שדות הטופס */
+mat-form-field.full-width {
+  margin-bottom: 8px;
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: rgba(32, 201, 151, 0.3); /* צבע מסגרת תכלת */
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline {
+  color: #20c997; /* צבע מסגרת תכלת כשהשדה במוקד */
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-thick {
+  color: #20c997; /* צבע מסגרת עבה כשהשדה במוקד */
+}
+
+::ng-deep .mat-form-field-label {
+  color: #333333 !important; /* שחור לתווית */
+}
+
+::ng-deep .mat-focused .mat-form-field-label {
+  color: #12977b !important; /* תכלת כהה לתווית כשהשדה במוקד */
+}
+
+::ng-deep .mat-input-element {
+  color: #333333 !important; /* טקסט שחור בשדות */
+}
+
+::ng-deep .mat-icon {
+  color: #20c997 !important; /* תכלת בהיר לאייקונים */
+}
+
+::ng-deep .mat-form-field.mat-focused .mat-icon {
+  color: #12977b !important; /* תכלת כהה לאייקונים כשהשדה במוקד */
+}
+
+::ng-deep .mat-form-field-ripple {
+  background-color: #20c997 !important; /* תכלת בהיר לאפקט ripple */
+}
+
+/* הודעות שגיאה בשחור במקום אדום */
+::ng-deep .mat-error {
+  color: #333333 !important; /* שחור להודעות שגיאה */
+}
+
+/* לוודא שגם התוית האדומה מסימון חובה תהיה בשחור */
+::ng-deep .mat-form-field-required-marker {
+  color: #333333 !important;
+}
+
+/* שינוי הצבע של המסגרת (כולל כשיש שגיאה) */
+::ng-deep .mat-form-field.mat-form-field-invalid .mat-form-field-outline {
+  color: rgba(32, 201, 151, 0.3) !important; /* שמירה על צבע המסגרת הרגיל גם כשיש שגיאה */
+  opacity: 1;
+}
+
+::ng-deep .mat-form-field.mat-form-field-invalid .mat-form-field-label {
+  color: #333333 !important; /* שחור לתווית גם כשיש שגיאה */
+}
+
+::ng-deep .mat-form-field.mat-form-field-invalid .mat-form-field-label .mat-form-field-required-marker {
+  color: #333333 !important; /* שחור לסימון חובה גם כשיש שגיאה */
+}
+
+/* עיצוב כפתור שמירה */
+button[mat-raised-button][color="primary"] {
+  background: linear-gradient(45deg, #12977b, #20c997);
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(32, 201, 151, 0.3);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+button[mat-raised-button][color="primary"]:hover:not([disabled]) {
+  background: linear-gradient(45deg, #108069, #1daf8c);
+  box-shadow: 0 6px 15px rgba(32, 201, 151, 0.4);
+  transform: translateY(-2px);
+}
+
+button[mat-raised-button][color="primary"][disabled] {
+  background: linear-gradient(45deg, #12977b80, #20c99780);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* עיצוב כפתור ביטול */
+button[mat-stroked-button][color="warn"] {
+  border: 2px solid #333333;
+  color: #333333;
+  background-color: transparent;
+  padding: 6px 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+button[mat-stroked-button][color="warn"]:hover {
+  background-color: rgba(51, 51, 51, 0.05);
+  transform: translateY(-2px);
+}
+
+button[mat-stroked-button][color="warn"] mat-icon {
+  color: #333333 !important;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 0;
+}
+
+/* אנימציה לשדות בטעינה */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+mat-form-field {
+  animation: fadeIn 0.5s ease forwards;
+  opacity: 0;
+}
+
+mat-form-field:nth-child(1) { animation-delay: 0.1s; }
+mat-form-field:nth-child(2) { animation-delay: 0.2s; }
+mat-form-field:nth-child(3) { animation-delay: 0.3s; }
+mat-form-field:nth-child(4) { animation-delay: 0.4s; }
+
+/* הסרת אפקט הרקע */
+.dialog-container::before {
+  display: none;
+}

@@ -1,25 +1,29 @@
+
 import  { useState } from 'react';
-import { Box, Container, Typography, Breadcrumbs, Link, Paper, Button } from '@mui/material';
+import { Box, Container, Typography, Breadcrumbs, Link, Paper, IconButton, Button, TextField, InputAdornment, Dialog } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import MicIcon from '@mui/icons-material/Mic';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import SearchIcon from '@mui/icons-material/Search';
 import FolderAndFileList from './FileAndFolderList';
 import NewFolderDialog from './NewFolderDialog';
 import FeatureCards from './FeaturesCard';
-// import {  VoiceRecorder } from '../VoiceRecorder';
 import { FileUploadSystem } from './system';
+import RecycleBinDialog from './Garbage';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../FileAndFolderStore/FileStore';
+import { searchFiles, searchFolders } from '../FileAndFolderStore/FilesSlice';
+import { VoiceRecorder } from '../VoiceRecorder';
 
 // Styled components
 const StyledHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
   padding: theme.spacing(2, 3),
   borderBottom: `1px solid ${theme.palette.divider}`,
-  direction: 'rtl', // הוסף זאת
-  textAlign: 'right', // הוסף זאת
+  direction: 'rtl',
+  textAlign: 'right',
 }));
 
 const ActionButton = styled(Button)(({ theme }) => ({
@@ -30,12 +34,56 @@ const ActionButton = styled(Button)(({ theme }) => ({
     opacity: 0.9,
   },
   marginLeft: theme.spacing(1),
+  whiteSpace: 'nowrap',
+  display: 'flex',
+  flexDirection: 'row', // וידוא שהכיוון הוא שמאל לימין
+  alignItems: 'center',
+  gap: theme.spacing(1), // רווח בין האייקון לטקסט
+}));
+
+const RecycleBinIconButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: '#e91e63',
+  color: 'white',
+  marginRight: theme.spacing(2),
+  '&:hover': {
+    backgroundColor: '#9c27b0',
+  },
+}));
+
+const SearchField = styled(TextField)(({ theme }) => ({
+  width: '250px',
+  marginRight: theme.spacing(1),
+}));
+
+const ActionsContainer = styled(Box)({
+  display: 'flex',
+  width: '100%',
+  justifyContent: 'space-between',
+});
+
+const LeftSection = styled(Box)(() => ({
+  display: 'flex',
+  alignItems: 'center',
+}));
+
+const RightSection = styled(Box)(() => ({
+  display: 'flex',
+  alignItems: 'center',
 }));
 
 const FileManager: React.FC = () => {
   const [newFolderOpen, setNewFolderOpen] = useState(false);
   const [_uploadFileOpen, setUploadFileOpen] = useState(false);
-  const [_recordingModalOpen, setRecordingModalOpen] = useState(false); // מצב עבור מודל ההקלטה
+  const [recordingModalOpen, setRecordingModalOpen] = useState(false);
+  const [recycleBinOpen, setRecycleBinOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [previousBreadcrumbs, setPreviousBreadcrumbs] = useState<{ id: number | null; name: string }[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const storedUser = sessionStorage.getItem('User');
+  const user = storedUser ? JSON.parse(storedUser) : null;
+
   const [breadcrumbs, setBreadcrumbs] = useState<{ id: number | null; name: string }[]>([
     { id: null, name: 'הקבצים שלי' },
   ]);
@@ -46,20 +94,47 @@ const FileManager: React.FC = () => {
   };
 
   const handleUploadFile = () => {
-    setUploadFileOpen(true);
-  };
+  const el = document.getElementById("upload-box");
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+      setUploadFileOpen(true);
+
+};
 
   const handleRecordLesson = () => {
-    // פתיחת מודל ההקלטה
     setRecordingModalOpen(true);
+  };
+
+  const handleRecordingModalClose = () => {
+    setRecordingModalOpen(false);
+    setRefreshKey(prev => prev + 1);
+  };
+
+  const handleRecycleBin = () => {
+    setRecycleBinOpen(true);
+  };
+
+  const handleRecycleBinClose = () => {
+    setRecycleBinOpen(false);
   };
 
   const handleBreadcrumbClick = (index: number) => {
     setBreadcrumbs(prev => prev.slice(0, index + 1));
+    // אם חוזרים לתיקייה שאינה חיפוש, נפעיל מחדש את התצוגה הרגילה
+    if (isSearchActive) {
+      setIsSearchActive(false);
+      setSearchQuery('');
+    }
   };
 
   const handleFolderNavigate = (folderId: number, folderName: string) => {
     setBreadcrumbs(prev => [...prev, { id: folderId, name: folderName }]);
+    // אם נכנסים לתיקייה בזמן חיפוש, נבטל את החיפוש
+    if (isSearchActive) {
+      setIsSearchActive(false);
+      setSearchQuery('');
+    }
   };
 
   const handleFolderCreated = () => {
@@ -67,8 +142,57 @@ const FileManager: React.FC = () => {
     setNewFolderOpen(false);
   };
 
+  // תיקון פונקציית החיפוש
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value;
+    setSearchQuery(query);
 
-  const currentFolderId = breadcrumbs[breadcrumbs.length - 1].id;
+    // אם שדה החיפוש ריק, בטל את החיפוש
+    if (query.trim() === '') {
+      if (isSearchActive) {
+        setIsSearchActive(false);
+        setBreadcrumbs(previousBreadcrumbs);
+      }
+      return;
+    }
+
+    // אם זה החיפוש הראשון, שמור את ה-breadcrumbs הנוכחי
+    if (!isSearchActive) {
+      setPreviousBreadcrumbs([...breadcrumbs]);
+      setIsSearchActive(true);
+      
+      // קבל את שם התיקייה הנוכחית
+      const currentFolder = breadcrumbs[breadcrumbs.length - 1].name;
+      
+      // עדכן את ה-breadcrumbs למצב חיפוש עם שם התיקייה הנוכחית
+      setBreadcrumbs([
+        { id: null, name: 'הקבצים שלי' },
+        { id: null, name: `תוצאות החיפוש ב${currentFolder}` }
+      ]);
+    }
+    
+    // קריאה לאקשנים של החיפוש
+    const folderId = breadcrumbs[breadcrumbs.length - 1].id;
+    
+    // חיפוש תיקיות
+    dispatch(searchFolders({
+      userId: user?.id,
+      currentFolderId: folderId, // שימוש בערך הנכון מה-breadcrumbs
+      query: query,
+    }));
+    
+    // חיפוש קבצים
+    dispatch(searchFiles({
+      userId: user?.id,
+      currentFolderId: folderId, // שימוש בערך הנכון מה-breadcrumbs
+      query: query,
+    }));
+  };
+  
+  // תיקון הגדרת currentFolderId
+  const currentFolderId = isSearchActive 
+    ? previousBreadcrumbs[previousBreadcrumbs.length - 1].id 
+    : breadcrumbs[breadcrumbs.length - 1].id;
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -77,9 +201,8 @@ const FileManager: React.FC = () => {
       </Typography>
 
       <Breadcrumbs 
-        separator={<NavigateNextIcon fontSize="small" />} 
         aria-label="breadcrumb"
-        sx={{ mb: 3, direction: 'rtl' }}
+        sx={{ mb: 3, direction: 'ltr' }}
       >
         <Link underline="hover" color="inherit" href="/">
           בית
@@ -113,41 +236,54 @@ const FileManager: React.FC = () => {
         }}
       >
         <StyledHeader>
-          <Typography variant="h6" sx={{ fontWeight: 500 }}>
-            הקבצים והתיקיות שלי
-          </Typography>
-          <Box sx={{ 
-  display: 'flex', 
-  flexDirection: 'row-reverse', // הופך את הסדר מימין לשמאל
-  gap: 1 
-}}>
-
-            {/* כפתור הקלטת שיעור */}
-            <ActionButton
-              variant="contained"
-              startIcon={<MicIcon />}
-              onClick={handleRecordLesson}
-              sx={{ 
-                background: 'linear-gradient(90deg, #e91e63 0%, #9c27b0 100%)',
-              }}
-            >
-              הקלטת שיעור
-            </ActionButton>
-            <ActionButton
-              variant="contained"
-              startIcon={<CreateNewFolderIcon />}
-              onClick={handleNewFolder}
-            >
-              תיקייה חדשה
-            </ActionButton>
-            <ActionButton
-              variant="contained"
-              startIcon={<UploadFileIcon />}
-              onClick={handleUploadFile}
-            >
-              העלאת קובץ
-            </ActionButton>
-          </Box>
+          <ActionsContainer>
+            <RightSection>
+              <RecycleBinIconButton onClick={handleRecycleBin}>
+                <DeleteOutlineIcon />
+              </RecycleBinIconButton>
+              
+              <SearchField
+                placeholder="חיפוש..."
+                variant="outlined"
+                size="small"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </RightSection>
+            
+            <LeftSection>
+              <ActionButton
+                variant="contained"
+                onClick={handleUploadFile}
+              >
+                <UploadFileIcon />
+                העלאת קובץ
+              </ActionButton>
+              
+              <ActionButton
+                variant="contained"
+                onClick={handleNewFolder}
+              >
+                <CreateNewFolderIcon />
+                תיקייה חדשה
+              </ActionButton>
+              
+              <ActionButton
+                variant="contained"
+                onClick={handleRecordLesson}
+              >
+                <MicIcon />
+                הקלטת שיעור
+              </ActionButton>
+            </LeftSection>
+          </ActionsContainer>
         </StyledHeader>
 
         <FolderAndFileList 
@@ -155,9 +291,12 @@ const FileManager: React.FC = () => {
           currentFolderId={currentFolderId} 
           onFolderClick={handleFolderNavigate} 
           currentFolder={currentFolderId}
-
+          isSearchMode={isSearchActive}
+          searchQuery={searchQuery}
         />
-        <FileUploadSystem parentId={currentFolderId} />
+<Box id="upload-box">
+  <FileUploadSystem parentId={currentFolderId} />
+</Box>
       </Paper>
 
       <FeatureCards />
@@ -168,26 +307,22 @@ const FileManager: React.FC = () => {
         onSuccess={handleFolderCreated}
         parentFolderId={currentFolderId}
       />
-      {/* <Dialog
-  open={recordingModalOpen}
-  onClose={() => setRecordingModalOpen(false)}
-  maxWidth="md"
-  fullWidth
-  PaperProps={{
-    sx: {
-      borderRadius: 2,
-      boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-    }
-  }}
->
-  <DialogContent sx={{ p: 3 }}>
-    <VoiceRecorder parentId={currentFolderId} />
-  </DialogContent>
-</Dialog>
- */}
-      {/* הוספת מודל ההקלטה */}
-    </Container>
 
+      <RecycleBinDialog 
+        open={recycleBinOpen} 
+        onClose={handleRecycleBinClose} 
+        currentFolderId={currentFolderId}
+      />
+
+      <Dialog
+        open={recordingModalOpen}
+        onClose={handleRecordingModalClose}
+        maxWidth="md"
+        fullWidth
+      >
+        <VoiceRecorder parentId={currentFolderId} />
+      </Dialog>
+    </Container>
   );
 };
 

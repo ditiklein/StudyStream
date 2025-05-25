@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>גישה אושרה לשיעור</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(to right, #f72585, #4361ee);
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .info {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .approval-notice {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            border-right: 5px solid #4caf50;
+            margin: 15px 0;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://example.com/logo.png" alt="לוגו" class="logo">
+        <h1>בקשת הגישה שלך אושרה!</h1>
+    </div>
+
+    <div class="content">
+        <h2>שלום,</h2>
+        <p>בקשת הגישה שלך לשיעור <strong>{{lessonName}}</strong> אושרה.</p>
+
+        <div class="approval-notice">
+            <p>יש לך כעת גישה מלאה לשיעור זה.</p>
+            <p>תאריך אישור: {{date}}</p>
+        </div>
+
+        <p>כדי לצפות בשיעור, לחץ על הכפתור למטה:</p>
+
+        <div style="text-align: center;">
+            <a href="{{accessLink}}" class="button">צפה בשיעור</a>
+        </div>
+
+        <div class="info">
+            <p>הקישור פעיל למשך 30 יום.</p>
+            <p>אם יש לך שאלות לגבי השיעור, אנא צור קשר עם משתף השיעור.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 מערכת הלמידה. כל הזכויות שמורות.</p>
+        <p>אם קיבלת הודעה זו בטעות, אנא התעלם ממנה ומחק אותה.</p>
+    </div>
+</body>
+</html>

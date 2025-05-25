@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Study.API.Models;
 using Study.Core.DTOs;
@@ -45,7 +46,7 @@ namespace Study.API.Controllers
 
         // POST api/Lesson
         [HttpPost]
-        public async Task<ActionResult<bool>> Post([FromBody] LessonPostModel lesson)
+        public async Task<ActionResult<LessonDTO>> Post([FromBody] LessonPostModel lesson)
         {
             if (lesson == null) return BadRequest("User data is required");
             var LessonD = _mapper.Map<LessonDTO>(lesson);
@@ -74,6 +75,7 @@ namespace Study.API.Controllers
             return result ? Ok(result) : NotFound("User not found or could not be deleted");
         }
         [HttpGet("lessons/{folderId}")]
+        
         public async Task<ActionResult<IEnumerable<LessonDTO>>> GetFilesInFolder(int folderId)
         {
             var files = await _lessonService.GetFilesInFolderAsync(folderId);
@@ -99,12 +101,7 @@ namespace Study.API.Controllers
             return Ok(folderDTOs);
 
         }
-        [HttpGet("search")]
-        public async Task<ActionResult<List<LessonDTO>>> SearchFilesAsync([FromQuery] string searchTerm)
-        {
-            var files = await _lessonService.SearchFilesAsync(searchTerm);
-            return Ok(files);
-        }
+      
         [HttpGet("lessons/user/{userId}")]
         public async Task<ActionResult<IEnumerable<LessonDTO>>> GetUserLessons(int userId)
         {
@@ -116,6 +113,53 @@ namespace Study.API.Controllers
 
             return Ok(folders);
         }
+        [HttpGet("deleted/{ownerId}")]
+        public async Task<ActionResult<IEnumerable<LessonDTO>>> GetDeletedLessons(int ownerId)
+        {
+            if (ownerId < 0) return BadRequest("Invalid owner ID");
+
+            var lessons = await _lessonService.GetDeletedLessonsByOwnerIdAsync(ownerId);
+
+
+            return Ok(lessons);
+        }
+        [HttpDelete("harddelete/{id}")]
+        public async Task<ActionResult<bool>> DeleteHard(int id)
+        {
+            if (id < 0) return BadRequest("Invalid input");
+
+            bool result = await _lessonService.DeleteHardLessonAsync(id);
+
+            // אם המחיקה הצליחה, מחזירים תשובה חיובית
+            if (result)
+            {
+                return Ok("Lesson permanently deleted.");
+            }
+
+            // אם לא הצליחה, מחזירים תשובה של לא נמצא
+            return NotFound("Lesson not found or could not be permanently deleted");
+        }
+        [HttpGet("search-files")]
+        public async Task<IActionResult> SearchFiles([FromQuery] int userId, [FromQuery] int folderId, [FromQuery] string query)
+        {
+            var files = await _lessonService.SearchFilesAsync(userId, folderId, query);
+            return Ok(files);
+        }
+        [HttpGet("with-transcript")]
+        public async Task<IActionResult> GetLessonsWithTranscript()
+        {
+            var lessons = await _lessonService.GetLessonsWithTranscriptAsync();
+            return Ok(lessons);
+        }
+
+        [HttpGet("without-transcript")]
+        public async Task<IActionResult> GetLessonsWithoutTranscript()
+        {
+            var lessons = await _lessonService.GetLessonsWithoutTranscriptAsync();
+            return Ok(lessons);
+        }
+
+
 
     }
 

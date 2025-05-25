@@ -1,36 +1,54 @@
-import  { useEffect, useState } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Typography, CircularProgress, Grid, TextField, IconButton } from '@mui/material';
-import { fetchRootFolders, fetchSubFoldersAndFiles, selectFoldersAndFiles, updateFile, updateFolder } from '../FileAndFolderStore/FilesSlice';
+import { fetchRootFolders, fetchSubFoldersAndFiles, searchFiles, searchFolders, selectFoldersAndFiles, updateFile, updateFolder } from '../FileAndFolderStore/FilesSlice';
 import { AppDispatch } from '../FileAndFolderStore/FileStore';
 import { EmptyState, FileContainer, FileImage, FolderImage, FolderImageContainer, ItemName, ItemWrapper } from './FolderAndFileStyle';
 import LongMenu from './Menu';
-
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import FileMenu from './MenuFile';
 import Swal from 'sweetalert2';
 import AudioModal from './AudioModel';
+import api from '../FileAndFolderStore/Api';
+import AudioEditModal from './AudioEditorModal';
 
 interface FolderAndFileListProps {
   currentFolderId: number | null;
   onFolderClick: (folderId: number, folderName: string) => void;
   folderImagePath?: string;
   fileImagePath?: string;
-  currentFolder:any
+  currentFolder: any;
+  isSearchMode?: boolean;
+  searchQuery?: string;
 }
 
-const FolderAndFileList: React.FC<FolderAndFileListProps> = ({ 
+const FolderAndFileList: React.FC<FolderAndFileListProps> = ({
   currentFolderId,
   onFolderClick,
   folderImagePath = '/f.png',
   fileImagePath = '/e.png',
-  currentFolder
+  currentFolder,
+  isSearchMode = false,
+  searchQuery = ''
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { folders, files, loading, error } = useSelector(selectFoldersAndFiles);
+  const {
+    folders,
+    files,
+    searchFoldersResults,
+    searchFilesResults,
+    loading,
+    error
+  } = useSelector(selectFoldersAndFiles);
+
+  // מציג תיקיות וקבצים בהתאם למצב החיפוש
+  const displayFolders = isSearchMode ? searchFoldersResults : folders;
+  const displayFiles = isSearchMode ? searchFilesResults : files;
+
   const storedUser = sessionStorage.getItem('User');
-const user = storedUser ? JSON.parse(storedUser) : null;
+  const user = storedUser ? JSON.parse(storedUser) : null;
 
   const [_hoverFolderId, setHoverFolderId] = useState<number | null>(null);
   const [_hoverFileId, setHoverFileId] = useState<number | null>(null);
@@ -41,15 +59,41 @@ const user = storedUser ? JSON.parse(storedUser) : null;
   const [openAudioModal, setOpenAudioModal] = useState<boolean>(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   
-  console.log(folders); // בדוק מה יש כאן
+  // State חדש לעריכת שמע
+  const [openAudioEditModal, setOpenAudioEditModal] = useState<boolean>(false);
+  const [audioEditUrl, setAudioEditUrl] = useState<string | null>(null);
+  const [audioEditFileName, setAudioEditFileName] = useState<string>('');
 
   useEffect(() => {
-    if (currentFolderId === null) {
-      dispatch(fetchRootFolders(user?.id));
-    } else {
-      dispatch(fetchSubFoldersAndFiles({ parentFolderId: currentFolderId, ownerId: user?.id }));
+    if (isSearchMode && searchQuery.trim() !== '') {
+      console.log("חיפוש עם הפרמטרים:", { 
+        userId: user?.id, 
+        currentFolderId, 
+        query: searchQuery 
+      });
+      
+      // חיפוש תיקיות
+      dispatch(searchFolders({
+        userId: user?.id,
+        currentFolderId,
+        query: searchQuery,
+      }));
+      
+      // חיפוש קבצים
+      dispatch(searchFiles({
+        userId: user?.id,
+        currentFolderId,
+        query: searchQuery,
+      }));
+    } else if (!isSearchMode) {
+      // טעינה רגילה של תיקיות וקבצים
+      if (currentFolderId === null) {
+        dispatch(fetchRootFolders(user?.id));
+      } else {
+        dispatch(fetchSubFoldersAndFiles({ parentFolderId: currentFolderId, ownerId: user?.id }));
+      }
     }
-  }, [dispatch, currentFolderId, user?.id]);
+  }, [dispatch, currentFolderId, user?.id, isSearchMode, searchQuery]);
 
   const handleFolderClick = (folderId: number, folderName: string) => {
     // אם התיקייה במצב עריכה, לא נפעיל את הפעולה
@@ -57,14 +101,23 @@ const user = storedUser ? JSON.parse(storedUser) : null;
     onFolderClick(folderId, folderName);
   };
 
-  const handleFileDownload = (url:string, fileName: string) => {
-    console.log(fileName);
-    const a = document.createElement('a');
-    a.href = url; // שים את ה-URL של הקובץ כאן
-    a.download = fileName; // הגדרת שם הקובץ שיורד למחשב
-    a.click(); // יוצא להפעלת ההורדה
+  const handleFileDownload = async (fileName: string) => {
+    try {
+      const a = document.createElement('a');
+      const downloadResponse = await api.get<string>(`/upload/download-url/${fileName}`);
+      a.href = downloadResponse.data;
+      a.download = fileName;
+      a.click();
+    } catch (error) {
+      console.error("שגיאה בהורדת קובץ:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'שגיאה בהורדת הקובץ',
+        text: 'אירעה שגיאה בעת ניסיון להוריד את הקובץ. נסה שנית.',
+        confirmButtonText: 'אישור'
+      });
+    }
   };
-
 
   // פונקציה להתחלת עריכת שם תיקייה
   const startEditingFolder = (folderId: number, currentName: string) => {
@@ -76,7 +129,9 @@ const user = storedUser ? JSON.parse(storedUser) : null;
   const saveNewFolderName = (id: number) => {
     if (editingFolderId !== null && newFolderName.trim()) {
       // בדיקה אם השם כבר קיים
-      const isNameTaken = folders.some(folder => folder.name === newFolderName.trim());
+      const isNameTaken = folders.some(folder => 
+        folder.id !== id && folder.name === newFolderName.trim()
+      );
       
       if (isNameTaken) {
         Swal.fire({
@@ -85,23 +140,35 @@ const user = storedUser ? JSON.parse(storedUser) : null;
           text: 'שם התיקייה כבר קיים!',
           confirmButtonText: 'אישור'
         });
-        return; // לא מבצע את העדכון
+        return;
       }
   
-      dispatch(updateFolder({ id, name: newFolderName, ownerId: user.id, parentFolderId: currentFolderId }))
+      dispatch(updateFolder({ 
+        id, 
+        name: newFolderName.trim(), 
+        ownerId: user.id, 
+        parentFolderId: currentFolderId 
+      }))
         .then(() => {
+          // רענון הרשימה לאחר עדכון השם
           if (currentFolderId === null) {
             dispatch(fetchRootFolders(user.id));
           } else {
             dispatch(fetchSubFoldersAndFiles({ parentFolderId: currentFolderId, ownerId: user.id }));
           }
+          
+          setEditingFolderId(null);
+          setNewFolderName('');
         })
         .catch((error) => {
           console.error("שגיאה בעדכון שם התיקייה:", error);
+          Swal.fire({
+            icon: 'error',
+            title: 'שגיאה',
+            text: 'אירעה שגיאה בעת עדכון שם התיקייה',
+            confirmButtonText: 'אישור'
+          });
         });
-  
-      setEditingFolderId(null);
-      setNewFolderName('');
     }
   };
     
@@ -132,38 +199,57 @@ const user = storedUser ? JSON.parse(storedUser) : null;
   };
   
   // פונקציה לשמירת שם קובץ חדש
-const saveNewFileName = (file: any) => {
-  if (editingFileId !== null && newFileName.trim()) {
-    const fileExtension = file.lessonName.includes('.') 
-      ? file.lessonName.substring(file.lessonName.lastIndexOf('.'))
-      : '';
-    const finalFileName = newFileName.includes('.') 
-      ? newFileName 
-      : newFileName + fileExtension;
-
-    dispatch(updateFile({
-      id: file.id, 
-      lessonName: finalFileName,
-      folderId: currentFolderId, 
-      ownerId: user.id,
-      fileType: file.fileType, 
-      url: file.url
-    }))
-    .then(() => {
-      if (currentFolderId === null) {
-        dispatch(fetchRootFolders(user.id));
-      } else {
-        dispatch(fetchSubFoldersAndFiles({ parentFolderId: currentFolderId, ownerId: user.id }));
+  const saveNewFileName = (_file: any) => {
+    if (editingFileId !== null && newFileName.trim()) {
+      // קבלת הקובץ הנוכחי
+      const currentFile = files.find(f => f.id === editingFileId);
+      
+      if (!currentFile) {
+        console.error("לא נמצא הקובץ לעריכה");
+        return;
       }
-    })
-    .catch((error) => {
-      console.error("שגיאה בעדכון שם הקובץ:", error);
-    });
+      
+      // שמירת הסיומת המקורית של הקובץ
+      const fileExtension = currentFile.urlName.includes('.') 
+        ? currentFile.urlName.substring(currentFile.urlName.lastIndexOf('.'))
+        : '';
+        
+      // הוספת הסיומת לשם החדש אם צריך
+      const finalFileName = newFileName.includes('.') 
+        ? newFileName 
+        : newFileName + fileExtension;
 
-    setEditingFileId(null);
-    setNewFileName('');
-  }
-};
+      dispatch(updateFile({
+        id: currentFile.id, 
+        lessonName: finalFileName,
+        folderId: currentFolderId, 
+        ownerId: user.id,
+        fileType: currentFile.fileType, 
+        url: currentFile.url,
+        isDeleted: currentFile.isDeleted
+      }))
+      .then(() => {
+        // רענון הרשימה לאחר עדכון השם
+        if (currentFolderId === null) {
+          dispatch(fetchRootFolders(user.id));
+        } else {
+          dispatch(fetchSubFoldersAndFiles({ parentFolderId: currentFolderId, ownerId: user.id }));
+        }
+        
+        setEditingFileId(null);
+        setNewFileName('');
+      })
+      .catch((error) => {
+        console.error("שגיאה בעדכון שם הקובץ:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'שגיאה',
+          text: 'אירעה שגיאה בעת עדכון שם הקובץ',
+          confirmButtonText: 'אישור'
+        });
+      });
+    }
+  };
   
   // פונקציה לביטול עריכת שם קובץ
   const cancelEditingFile = () => {
@@ -172,19 +258,76 @@ const saveNewFileName = (file: any) => {
   };
 
   // טיפול בלחיצת מקש בשדה העריכה של קובץ
-  const handleFileKeyDown = (e: React.KeyboardEvent, id: number) => {
+  const handleFileKeyDown = (e: React.KeyboardEvent, file: any) => {
     if (e.key === 'Enter') {
-      saveNewFileName(id);
+      saveNewFileName(file);
     } else if (e.key === 'Escape') {
       cancelEditingFile();
     }
   };
 
-  const handlePlayAudio = (fileUrl: string) => {
-    setAudioUrl(fileUrl); // הגדרת כתובת השמע
-    setOpenAudioModal(true); // פתיחת המודל
+  // פונקציה להפעלת קובץ שמע
+  const handlePlayAudio = async (name: string) => {
+    try {
+      console.log("הפעלת שמע:", name);
+      
+      const downloadResponse = await api.get<string>(`/upload/download-url/${name}`);
+      console.log("תשובה מהשרת:", downloadResponse);
+
+      if (downloadResponse && downloadResponse.data) {
+        setAudioUrl(downloadResponse.data);
+        setOpenAudioModal(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'שגיאה',
+          text: 'לא ניתן להפעיל את קובץ השמע',
+          confirmButtonText: 'אישור'
+        });
+      }
+    } catch (error) {
+      console.error("שגיאה בהפעלת קובץ שמע:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'שגיאה',
+        text: 'אירעה שגיאה בעת ניסיון להפעיל את קובץ השמע',
+        confirmButtonText: 'אישור'
+      });
+    }
+  };
+
+  // פונקציה חדשה לפתיחת מודל עריכת שמע
+  const handleEditAudio = async (fileName: string) => {
+    try {
+      console.log("פתיחת עריכת שמע:", fileName);
+      
+      const downloadResponse = await api.get<string>(`/upload/download-url/${fileName}`);
+      console.log("תשובה מהשרת לעריכת שמע:", downloadResponse);
+
+      if (downloadResponse && downloadResponse.data) {
+        setAudioEditUrl(downloadResponse.data);
+        setAudioEditFileName(fileName);
+        setOpenAudioEditModal(true);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'שגיאה',
+          text: 'לא ניתן לפתוח את קובץ השמע לעריכה',
+          confirmButtonText: 'אישור'
+        });
+      }
+    } catch (error) {
+      console.error("שגיאה בפתיחת עריכת קובץ שמע:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'שגיאה',
+        text: 'אירעה שגיאה בעת ניסיון לפתוח את קובץ השמע לעריכה',
+        confirmButtonText: 'אישור'
+      });
+    }
   };
   
+  // הצגת טעינה
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
@@ -193,6 +336,7 @@ const saveNewFileName = (file: any) => {
     );
   }
 
+  // הצגת שגיאה
   if (error) {
     return (
       <Box sx={{ p: 3, color: 'error.main' }}>
@@ -201,26 +345,35 @@ const saveNewFileName = (file: any) => {
     );
   }
 
-  if (folders.length === 0 && files.length === 0) {
+  // הודעה כאשר אין תיקיות וקבצים להצגה
+  if (displayFolders.length === 0 && displayFiles.length === 0) {
     return (
       <EmptyState>
-        <Typography variant="body1" sx={{ mb: 1 }}>
-          התיקייה ריקה
-        </Typography>
-        <Typography variant="body2">
-          צור תיקייה חדשה או העלה קבצים כדי להתחיל
-        </Typography>
+        {isSearchMode ? (
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            לא נמצאו תוצאות עבור "{searchQuery}"
+          </Typography>
+        ) : (
+          <>
+            <Typography variant="body1" sx={{ mb: 1 }}>
+              התיקייה ריקה
+            </Typography>
+            <Typography variant="body2">
+              צור תיקייה חדשה או העלה קבצים כדי להתחיל
+            </Typography>
+          </>
+        )}
       </EmptyState>
     );
   }
 
   return (
     <Box sx={{ p: 3 }}>
-      {folders.length > 0 && (
+      {displayFolders.length > 0 && (
         <Box sx={{ mb: 4 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>תיקיות</Typography>
           <Grid container spacing={2}>
-            {folders.map((folder) => (
+            {displayFolders.map((folder) => (
               <Grid item xs={6} sm={4} md={3} lg={2} key={folder.id}>
                 <Box
                   sx={{ 
@@ -241,14 +394,12 @@ const saveNewFileName = (file: any) => {
                     }}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    
                     <LongMenu 
                       id={folder.id} 
                       onEdit={() => startEditingFolder(folder.id, folder.name)} 
                       folder={folder} 
                       currentFolder={currentFolder}
                     />
-                    
                   </Box>
                   <ItemWrapper onClick={() => handleFolderClick(folder.id, folder.name)}>
                     <FolderImageContainer>
@@ -263,7 +414,6 @@ const saveNewFileName = (file: any) => {
                         width: '100%', 
                         mt: 1
                       }}>
-                        {/* כפתורי שמירה וביטול מעל השדה בצד שמאל */}
                         <Box sx={{ 
                           position: 'absolute',
                           top: -20,
@@ -306,7 +456,7 @@ const saveNewFileName = (file: any) => {
                           sx={{ 
                             '& .MuiOutlinedInput-root': {
                               borderRadius: '4px',
-                              height: '32px'  // שדה עריכה דק יותר
+                              height: '32px'
                             }
                           }}
                         />
@@ -322,11 +472,11 @@ const saveNewFileName = (file: any) => {
         </Box>
       )}
 
-      {files.length > 0 && (
+      {displayFiles.length > 0 && (
         <Box>
           <Typography variant="h6" sx={{ mb: 2 }}>קבצים</Typography>
           <Grid container spacing={2}>
-            {files.map((file) => (
+            {displayFiles.map((file) => (
               <Grid item xs={6} sm={4} md={3} lg={2} key={file.id}>
                 <Box
                   sx={{ 
@@ -350,15 +500,15 @@ const saveNewFileName = (file: any) => {
                     <FileMenu 
                       id={file.id}
                       onEdit={() => handleFileEdit(file.id)}
-                      onUpload={() => handleFileDownload(file.id, file.lessonName)}
-                      onPlayAudio={() => handlePlayAudio(file.url)} 
-                      file={file} // קריאה להפעלת שמע
+                      onUpload={() => handleFileDownload(file.lessonName)}
+                      onPlayAudio={() => handlePlayAudio(file.lessonName)}
+                      onEditAudio={() => handleEditAudio(file.lessonName)}
+                      file={file}
                       currentFolder={currentFolder}
                     />
                   </Box>
                   <ItemWrapper>
                     <FileContainer>
-                      {/* מציג את תמונת הקובץ בגודל זהה לתמונת התיקייה */}
                       <FileImage 
                         src={fileImagePath} 
                         alt={file.lessonName} 
@@ -370,7 +520,6 @@ const saveNewFileName = (file: any) => {
                         width: '100%', 
                         mt: 1
                       }}>
-                        {/* כפתורי שמירה וביטול מעל השדה בצד שמאל */}
                         <Box sx={{ 
                           position: 'absolute',
                           top: -20,
@@ -414,15 +563,15 @@ const saveNewFileName = (file: any) => {
                             direction: 'rtl', 
                             '& .MuiOutlinedInput-root': {
                               borderRadius: '4px',
-                              height: '32px'  // שדה עריכה דק יותר
+                              height: '32px'
                             }
                           }}
                         />
                       </Box>
                     ) : (
-        <ItemName variant="body2">
-         {file.lessonName.replace(/\.[^/.]+$/, '')}
-        </ItemName>
+                      <ItemName variant="body2">
+                        {file.urlName.replace(/\.[^/.]+$/, '')}
+                      </ItemName>
                     )}
                   </ItemWrapper>
                 </Box>
@@ -431,14 +580,21 @@ const saveNewFileName = (file: any) => {
           </Grid>
         </Box>
       )}
-          <AudioModal 
-      open={openAudioModal} 
-      onClose={() => setOpenAudioModal(false)} 
-      audioUrl={audioUrl} 
-    />
-
+      
+      <AudioModal 
+        open={openAudioModal} 
+        onClose={() => setOpenAudioModal(false)} 
+        audioUrl={audioUrl} 
+      />
+      
+      <AudioEditModal 
+        open={openAudioEditModal} 
+        onClose={() => setOpenAudioEditModal(false)} 
+        audioUrl={audioEditUrl}
+        fileName={audioEditFileName}
+      />
     </Box>
   );
 };
 
-export default FolderAndFileList
+export default FolderAndFileList;

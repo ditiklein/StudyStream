@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Study.API.Models;
 using Study.Core.DTOs;
@@ -28,20 +29,31 @@ namespace Study.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TranscriptDTO>>> Get()
         {
-            var transcripts =await _transcriptService.GetAllTranscriptAsync();
+            var transcripts = await _transcriptService.GetAllTranscriptAsync();
             return Ok(transcripts);
         }
 
         // GET api/Transcript/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<TranscriptDTO>> GetById(int id)
         {
             if (id < 0) return BadRequest();
 
-            var result =await _transcriptService.GetTranscriptByIdAsync(id);
+            var result = await _transcriptService.GetTranscriptByIdAsync(id);
             if (result == null) return NotFound();
 
             return Ok(result);
+        }
+        [HttpGet("lesson/{lessonId}")]
+        public async Task<ActionResult<TranscriptDTO>> GetByLessonId(int lessonId)
+        {
+            if (lessonId <= 0) return BadRequest("Invalid lesson ID");
+
+            var transcript = await _transcriptService.GetTranscriptByLessonIdAsync(lessonId);
+            if (transcript == null) return NotFound("Transcript not found for this lesson");
+
+            return Ok(transcript);
         }
 
         // POST api/Transcript
@@ -57,6 +69,7 @@ namespace Study.API.Controllers
 
         // PUT api/Transcript/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<ActionResult> Put(int id, [FromBody] TranscriptPostModel transcript)
         {
             if (transcript == null || id < 0) return BadRequest("Invalid input");

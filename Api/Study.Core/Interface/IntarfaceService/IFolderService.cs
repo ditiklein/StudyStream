@@ -17,10 +17,8 @@ namespace Study.Core.Interface.IntarfaceService
         Task<bool> DeleteFolderAsync(int id);
         Task<IEnumerable<Folder>> GetRootFoldersAsync(int ownerId);
         Task<IEnumerable<FolderDTO>> GetSubFoldersAsync(int parentFolderId, int ownerId);
-        Task<List<FolderDTO>> SearchFoldersAsync(string searchTerm);
         Task<IEnumerable<FolderDTO>> GetUserFoldersAsync(int userId);
-
-
+        Task<List<FolderDTO>> SearchFoldersAsync(int userId, int? currentFolderId, string query);
 
     }
 }

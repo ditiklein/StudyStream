@@ -115,6 +115,79 @@ namespace Study.Data.Repository
                 .Where(f => f.OwnerId == userId)
                 .ToListAsync();
         }
+        //public List<Folder> GetFoldersRecursively(int folderId)
+        //{
+        //    var allFolders = _datacontext.FolderList.ToList(); // טוען את כל התיקיות לזיכרון
+
+        //    // מחפש את כל התיקיות תחת folderId כולל התיקיות שבפנים
+        //    return GetAllSubFolderIds(folderId, allFolders)
+        //        .Select(id => allFolders.First(f => f.Id == id))
+        //        .ToList();
+        //}
+        //public List<int> GetAllSubFolderIds(int folderId, List<Folder> allFolders)
+        //{
+        //    // מחזיר רשימה ריקה בתחילה במקום להכליל את folderId עצמו
+        //    var folderIds = new List<int>();
+        //    var subFolders = allFolders.Where(f => f.ParentFolderId == folderId).ToList();
+        //    foreach (var folder in subFolders)
+        //    {
+        //        folderIds.Add(folder.Id); // מוסיף את התיקיות הישירות
+        //        folderIds.AddRange(GetAllSubFolderIds(folder.Id, allFolders)); // קריאה רקורסיבית לתיקיות בתוך התיקיות
+        //    }
+        //    return folderIds;
+        //}
+        //public async Task<List<Folder>> SearchFoldersAsync(int userId, int currentFolderId, string query)
+        //{
+        //    var folders = GetFoldersRecursively(currentFolderId); // טוען את כל התיקיות הרקורסיביות
+
+        //    return await Task.Run(() =>
+        //        folders
+        //            .Where(f => f.OwnerId == userId && f.Name.Contains(query))
+        //            .ToList());
+        //}
+        public List<Folder> GetFoldersRecursively(int? folderId)
+        {
+            var allFolders = _datacontext.FolderList.ToList(); // טוען את כל התיקיות לזיכרון
+
+            if (folderId == null)
+            {
+                // אם folderid הוא null, נחזיר את כל התיקיות ברמה העליונה (תיקיות שורש)
+                return allFolders.Where(f => f.ParentFolderId == null).ToList();
+            }
+
+            // אחרת, נחזיר את כל התיקיות תחת folderId
+            return GetAllSubFolderIds(folderId.Value, allFolders)
+                .Select(id => allFolders.First(f => f.Id == id))
+                .Where(f => f.Id != folderId.Value) // לא כולל את התיקייה הראשית
+                .ToList();
+        }
+
+        public List<int> GetAllSubFolderIds(int folderId, List<Folder> allFolders)
+        {
+            var folderIds = new List<int>();
+            var subFolders = allFolders.Where(f => f.ParentFolderId == folderId).ToList();
+
+            // הוספת התיקיות הישירות
+            foreach (var folder in subFolders)
+            {
+                folderIds.Add(folder.Id);
+                folderIds.AddRange(GetAllSubFolderIds(folder.Id, allFolders)); // קריאה רקורסיבית
+            }
+
+            return folderIds;
+        }
+
+        public async Task<List<Folder>> SearchFoldersAsync(int userId, int? currentFolderId, string query)
+        {
+            var folders = GetFoldersRecursively(currentFolderId); // טוען את כל התיקיות הרלוונטיות
+
+            return await Task.Run(() =>
+                folders
+                    .Where(f => f.OwnerId == userId && f.Name.Contains(query))
+                    .ToList());
+        }
+
+
 
 
     }

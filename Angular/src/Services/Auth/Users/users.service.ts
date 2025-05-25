@@ -8,7 +8,7 @@ import { user } from '../../../Models/User';
 })
 export class UsersService {
 
-  private apiUrl = 'https://localhost:7147/api/User';
+  private apiUrl = 'http://localhost:5220/api/User';
   constructor(private http: HttpClient) { }
 
   getUsers(): Observable<any> {

@@ -61,6 +61,9 @@ namespace Study.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("FileType")
                         .HasColumnType("longtext");
 
@@ -79,7 +82,7 @@ namespace Study.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Url")
+                    b.Property<string>("UrlName")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
@@ -114,6 +117,53 @@ namespace Study.Data.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("Study.Core.Entities.SharedLesson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("AccessRequestToken")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("EmailVerificationCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("EmailVerificationExpiry")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("FailedVerificationAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("LessonId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SharedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("SharedWithEmail")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LessonId");
+
+                    b.ToTable("SharedLessons");
+                });
+
             modelBuilder.Entity("Study.Core.Entities.Transcript", b =>
                 {
                     b.Property<int>("Id")
@@ -137,6 +187,9 @@ namespace Study.Data.Migrations
 
                     b.Property<int>("UpdateBy")
                         .HasColumnType("int");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -237,6 +290,17 @@ namespace Study.Data.Migrations
                     b.Navigation("Folder");
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("Study.Core.Entities.SharedLesson", b =>
+                {
+                    b.HasOne("Study.Core.Entities.Lesson", "Lesson")
+                        .WithMany()
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Lesson");
                 });
 
             modelBuilder.Entity("Study.Core.Entities.Transcript", b =>

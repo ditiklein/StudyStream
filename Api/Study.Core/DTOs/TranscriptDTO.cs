@@ -10,6 +10,8 @@ namespace Study.Core.DTOs
     {
         public int Id { get; set; }
         public int LessonId { get; set; }
+        public string UserName { get; set; }
+
         public string? TranscriptUrl { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }

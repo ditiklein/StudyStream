@@ -22,12 +22,14 @@ using Microsoft.EntityFrameworkCore;
 Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
+
 // רישום שירותי Business
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<ITranscriptService, TranscriptService>();
 builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<IFolderService, FolderService>();
+builder.Services.AddScoped<IStatsticsService, StatsticsService>();
 
 // רישום שירותי Repository
 builder.Services.AddScoped<IRepository<User>, UserRepository>();
@@ -38,18 +40,26 @@ builder.Services.AddScoped<IRepository<UserRole>, UserRoleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+builder.Services.AddScoped<ITranscriptRepository, TranscriptRepository>();
 
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IReposiroryManager, RepositoryManager>();
 
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddSignalR();
+builder.Services.AddScoped<TranscriptionSe>();
+
 
 // רישום שירות OpenAI כשירות Singleton
 builder.Services.AddSingleton<OpenAIService>(sp => new OpenAIService(new OpenAiOptions
 {
     ApiKey = builder.Configuration["OpenAI:ApiKey"]
 }));
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+});
 
 //builder.Services.AddScoped<AuthService>();
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
@@ -100,31 +110,38 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
 });
 
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowAllOrigins", policy =>
-//           policy.AllowAnyOrigin()  // מאפשר לכל מקור לגשת
-//                 .AllowAnyMethod()
-//                 .AllowAnyHeader()
-//    );
-
-//});
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigins", policy =>
-        policy.WithOrigins("http://localhost:5173") // הוסף כאן את כתובת ה-URL של הממשק הקדמי שלך
+    options.AddPolicy("AllowFrontend", policy =>
+        policy.WithOrigins("http://localhost:5174" +
+        "", "http://localhost:4200", "http://localhost:51306") // או ה־frontend שלך
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials()); // זה קריטי עבור SignalR
+              .AllowCredentials()
+    );
 });
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAll", policy =>
+//                policy.WithOrigins("http://localhost:5714") // החלף עם כתובת האתר שלך
+//              .AllowAnyMethod()
+//              .AllowAnyHeader()
+//              .AllowCredentials()); // חשוב עבור SignalR!
+//});
 
 
-var connectionString = "Server=byo3p4s57fzedf1iyboh-mysql.services.clever-cloud.com;Port=3306;Database=byo3p4s57fzedf1iyboh;User=ut4tbtgcqt9icjzh;Password=9bDF0LYJtL7wFUQSeyrV";
+
+
+var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
+//builder.Services.AddDbContext<DataContext>(option =>
+//{
+//    option.UseSqlServer("Data Source=DESKTOP-8ED3CL9;Initial Catalog=Study;Integrated Security=false;  Trusted_Connection = SSPI; MultipleActiveResultSets = true; TrustServerCertificate = true");
+//});
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddHttpClient();
@@ -169,19 +186,20 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // הפעלת CORS עם המדיניות שהגדרנו
-app.UseCors("AllowSpecificOrigins");
+app.UseCors("AllowFrontend");
 
 
 
-//app.UseAuthentication();
-//app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
+
+
+
+
 app.MapHub<TranscriptionHub>("/transcriptionHub");
 
-//app.UseEndpoints(endpoints => {
-//    endpoints.MapHub<TranscriptionHub>("/transcriptionHub");
-//});
 
 
 app.Run();
