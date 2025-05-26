@@ -187,7 +187,7 @@ const AudioEditModal: React.FC<AudioEditModalProps> = ({ open, onClose, audioUrl
       const blob = new Blob([data], { type: mimeType })
 
       const fileNameToUse = fileName || "audio_file.wav"
-      const presignedUrl = `http://localhost:5220/api/upload/presigned-url?fileName=${encodeURIComponent(fileNameToUse)}&contentType=${encodeURIComponent(mimeType)}`
+      const presignedUrl = `https://studystreamserver.onrender.com/api/upload/presigned-url?fileName=${encodeURIComponent(fileNameToUse)}&contentType=${encodeURIComponent(mimeType)}`
 
       const presignedResponse = await fetch(presignedUrl)
       if (!presignedResponse.ok) {
