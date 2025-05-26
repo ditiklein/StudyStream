@@ -41,7 +41,7 @@ export default function LongMenu({ id, onEdit,folder,currentFolder}: LongMenuPro
     event.stopPropagation();
 
     handleClose();
-    setOpenTransferDialog(true); // פותח את הדיאלוג של העברת הקובץ
+    setOpenTransferDialog(true);
 
   };
 

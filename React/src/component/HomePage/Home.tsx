@@ -1,4 +1,4 @@
-import Demo from "./Demo";
+import Demo from "./Demo/Demo";
 import Features from "./Features";
 import Footer from "./Footer";
 import Hero from "./Hero.";

@@ -46,13 +46,11 @@ const RecycleBinDialog: React.FC<RecycleBinDialogProps> = ({
   const [recordings, setRecordings] = useState<any[]>([]);
   const dispatch = useDispatch<AppDispatch>();
 
-  // שמירה על המשתמש ב-useMemo כדי להימנע מהרינדור אינסופי
   const storedUser = useMemo(() => sessionStorage.getItem('User'), []);
   const user = storedUser ? JSON.parse(storedUser) : null;
 
   const fetchDeletedLessons = useCallback(async () => {
-    if (!user) return; // אם אין משתמש, אין צורך להמשיך
-
+    if (!user) return; 
     try {
 const response = await api.get(`/Lesson/deleted/${user.id}`);
       if (response.data) {
@@ -68,7 +66,7 @@ const response = await api.get(`/Lesson/deleted/${user.id}`);
 
   useEffect(() => {
     if (open) {
-      fetchDeletedLessons(); // רק כאשר הדיאלוג נפתח
+      fetchDeletedLessons();
     }
   },);
 
@@ -93,9 +91,9 @@ const response = await api.get(`/Lesson/deleted/${user.id}`);
         })).unwrap();
       }
 
-      await fetchDeletedLessons(); // עדכון הנתונים אחרי שחזור
+      await fetchDeletedLessons(); 
 
-      onClose(); // סגירת הדיאלוג לאחר פעולה
+      onClose(); 
     } catch (error) {
       console.error("Error restoring file:", error);
     }
@@ -103,12 +101,11 @@ const response = await api.get(`/Lesson/deleted/${user.id}`);
 
   const handlePermanentDelete = async (file: any) => {
     try {
-      // קריאת API למחיקת הקובץ מ-S3
       await api.delete(`upload/delete/${file.lessonName}`);
       console.log(`File ${file.lessonName} deleted from S3 successfully`);
       
       await dispatch(hardDeleteFile(file.id));
-      onClose(); // סגירת הדיאלוג לאחר מחיקה
+      onClose(); 
     } catch (error) {
       console.error("Error deleting lesson permanently:", error);
     }

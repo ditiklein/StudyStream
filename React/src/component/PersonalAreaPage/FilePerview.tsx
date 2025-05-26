@@ -18,7 +18,6 @@ const FilePreview: React.FC<FilePreviewProps> = ({ files, onRemove }) => {
           }
         >
           <ListItemIcon>
-            {/* <FileIcon /> */}
           </ListItemIcon>
           <ListItemText
             primary={file.name}

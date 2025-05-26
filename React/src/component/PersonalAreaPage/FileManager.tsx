@@ -7,7 +7,6 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import MicIcon from '@mui/icons-material/Mic';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SearchIcon from '@mui/icons-material/Search';
-import FolderAndFileList from './FileAndFolderList';
 import NewFolderDialog from './NewFolderDialog';
 import FeatureCards from './FeaturesCard';
 import { FileUploadSystem } from './system';
@@ -16,8 +15,8 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../FileAndFolderStore/FileStore';
 import { searchFiles, searchFolders } from '../FileAndFolderStore/FilesSlice';
 import { VoiceRecorder } from '../VoiceRecorder';
+import FolderAndFileList from './FolderAndFileList/FolderAndList';
 
-// Styled components
 const StyledHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
   padding: theme.spacing(2, 3),
@@ -36,9 +35,9 @@ const ActionButton = styled(Button)(({ theme }) => ({
   marginLeft: theme.spacing(1),
   whiteSpace: 'nowrap',
   display: 'flex',
-  flexDirection: 'row', // וידוא שהכיוון הוא שמאל לימין
+  flexDirection: 'row',
   alignItems: 'center',
-  gap: theme.spacing(1), // רווח בין האייקון לטקסט
+  gap: theme.spacing(1)
 }));
 
 const RecycleBinIconButton = styled(IconButton)(({ theme }) => ({
@@ -142,12 +141,10 @@ const FileManager: React.FC = () => {
     setNewFolderOpen(false);
   };
 
-  // תיקון פונקציית החיפוש
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value;
     setSearchQuery(query);
 
-    // אם שדה החיפוש ריק, בטל את החיפוש
     if (query.trim() === '') {
       if (isSearchActive) {
         setIsSearchActive(false);
@@ -156,40 +153,34 @@ const FileManager: React.FC = () => {
       return;
     }
 
-    // אם זה החיפוש הראשון, שמור את ה-breadcrumbs הנוכחי
     if (!isSearchActive) {
       setPreviousBreadcrumbs([...breadcrumbs]);
       setIsSearchActive(true);
       
-      // קבל את שם התיקייה הנוכחית
       const currentFolder = breadcrumbs[breadcrumbs.length - 1].name;
       
-      // עדכן את ה-breadcrumbs למצב חיפוש עם שם התיקייה הנוכחית
       setBreadcrumbs([
         { id: null, name: 'הקבצים שלי' },
         { id: null, name: `תוצאות החיפוש ב${currentFolder}` }
       ]);
     }
     
-    // קריאה לאקשנים של החיפוש
     const folderId = breadcrumbs[breadcrumbs.length - 1].id;
     
-    // חיפוש תיקיות
     dispatch(searchFolders({
       userId: user?.id,
-      currentFolderId: folderId, // שימוש בערך הנכון מה-breadcrumbs
+      currentFolderId: folderId, 
       query: query,
     }));
     
     // חיפוש קבצים
     dispatch(searchFiles({
       userId: user?.id,
-      currentFolderId: folderId, // שימוש בערך הנכון מה-breadcrumbs
+      currentFolderId: folderId,
       query: query,
     }));
   };
   
-  // תיקון הגדרת currentFolderId
   const currentFolderId = isSearchActive 
     ? previousBreadcrumbs[previousBreadcrumbs.length - 1].id 
     : breadcrumbs[breadcrumbs.length - 1].id;

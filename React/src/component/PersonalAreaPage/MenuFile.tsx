@@ -15,6 +15,7 @@ import ListItemText from '@mui/material/ListItemText';
 import { AppDispatch } from '../FileAndFolderStore/FileStore';
 import { deleteFile } from '../FileAndFolderStore/FilesSlice';
 import TransferFileDialog from '../FolderListDialog';
+import { Lesson } from '../../Modles/File';
 
 const ITEM_HEIGHT = 48;
 
@@ -24,7 +25,7 @@ interface FileMenuProps {
   onUpload?: () => void;
   onPlayAudio?: () => void;
   onEditAudio?: () => void;
-  file: any;
+  file: Lesson;
   currentFolder: any;
 }
 
@@ -182,7 +183,7 @@ export default function FileMenu({
           setOpenTransferDialog(false);
         }}
         file={file}
-        folder={null}
+        folder={currentFolder}
         currentFolder={currentFolder}
       />
     </>

@@ -4,7 +4,6 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
-// סגנונות מותאמים אישית
 const GradientBox = styled(Box)(({ theme }) => ({
   background: 'linear-gradient(90deg, #3f51b5 0%, #7e57c2 100%)',
   padding: theme.spacing(6, 2),

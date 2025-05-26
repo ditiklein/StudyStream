@@ -52,7 +52,6 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, onClose, audioUrl }) => {
           />
         </Box>
 
-        {/* נגן אודיו */}
         {audioUrl && (
           <Box
             sx={{

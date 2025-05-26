@@ -239,12 +239,14 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from './FileAndFolderStore/FileStore';
 import { fetchRootFolders, fetchSubFoldersAndFiles, updateFile, updateFolder } from './FileAndFolderStore/FilesSlice';
 import api from './FileAndFolderStore/Api';
+import { Lesson } from '../Modles/File';
+import { Folder } from '../Modles/Folder';
 
 interface TransferFileDialogProps {
   open: boolean;
   onClose: () => void;
-  file?: any;
-  folder?: any;
+  file?: Lesson|null;
+  folder?: Folder;
   currentFolder: number | null;
 }
 
@@ -326,18 +328,18 @@ const TransferFileDialog = ({
         console.log('מעביר קובץ:', file);
         await dispatch(updateFile({
           id: file.id,
-          lessonName: file.lessonName,
+          lessonName: file.lessonName||'',
           folderId: selectedFolder,
           ownerId: user.id,
-          fileType: file.fileType,
-          url: file.url,
+          fileType: file.fileType||'',
+          url: file.urlName||'',
           isDeleted: file.isDeleted
         }));
       } else if (folder) {
         console.log('מעביר תיקייה:', folder);
         await dispatch(updateFolder({
           id: folder.id,
-          name: folder.name,
+          name: folder.name||'',
           ownerId: user.id,
           parentFolderId: selectedFolder
         }));
