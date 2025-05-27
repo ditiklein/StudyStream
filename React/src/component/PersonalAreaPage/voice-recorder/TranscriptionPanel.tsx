@@ -20,7 +20,6 @@ export const TranscriptionPanel: React.FC<TranscriptionPanelProps> = ({
   currentTranscript,
   recording,
   primaryColor,
-  lessonName,
   onCopyTranscript,
   onDownloadTranscript,
 }) => {
