@@ -1,23 +1,15 @@
 import { useState, useEffect } from 'react';
-import {   
-  Box,   
-  Typography,   
-  List,   
-  ListItem,   
-  ListItemText,
-  ListItemIcon,
-  Divider,
-  InputBase,
-  Paper,
-  IconButton
+import {    Box,    Typography,    List,    ListItem,    ListItemText, ListItemIcon, Divider,
+  InputBase,Paper,IconButton
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AudioFileIcon from '@mui/icons-material/AudioFile';
+import { Lesson } from '../../Modles/File';
 
 interface SidebarProps {
-  recordings: any[];
+  recordings: Lesson[];
   onSelectRecording: (recording: any) => void;
-  selectedRecording: any | null;
+  selectedRecording: Lesson | null;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -32,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     if (recordings) {
       const filtered = searchText 
         ? recordings.filter(item => 
-            removeFileExtension(item.lessonName)
+            removeFileExtension(item.lessonName||'')
               .toLowerCase()
               .includes(searchText.toLowerCase())
           )

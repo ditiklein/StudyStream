@@ -127,7 +127,6 @@ export const handleConfirmation = async (
         // שימוש באובייקט DB מוטיפס לשליחה לשרת
         dispatch(addFile(dbFile));
       }
-      alert("העלאה הושלמה בהצלחה!");
       setUploadProgress(0);
       setIsDialogOpen(false);
       setSelectedFiles([]);

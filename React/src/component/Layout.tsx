@@ -1,6 +1,6 @@
 import { AppBar, Toolbar, Button, Box, Container} from '@mui/material'; 
 import { Link, Outlet, useNavigate } from 'react-router-dom'; 
-import { NameAvatar } from '../Auth/Avatar';  
+import { NameAvatar } from './Auth/Avatar';  
 
 const Layout = () => {   
   // const theme = useTheme();   

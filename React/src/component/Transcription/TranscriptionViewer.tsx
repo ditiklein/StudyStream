@@ -4,7 +4,7 @@ import { Button, Box, Typography, CircularProgress, Paper,Divider,IconButton,Too
 import { useEffect, useState, useRef } from 'react';
 import InfoIcon from '@mui/icons-material/Info';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import TranscriptSection from './RRR';
+import TranscriptSection from './TranscriptSection';
 import api from '../FileAndFolderStore/Api';
 import SaveTranscriptDialog from './SaveTranscriptDialog';
 

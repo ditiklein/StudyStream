@@ -1,14 +1,18 @@
+
 import { useEffect, useState } from 'react';
 import { Box, Container, Typography, Paper, useTheme } from '@mui/material';
+import { useLocation } from 'react-router-dom'; // הוספת useLocation
 import TranscriptionViewer from "./TranscriptionViewer";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserFiles, selectFoldersAndFiles } from '../FileAndFolderStore/FilesSlice';
 import { AppDispatch } from '../FileAndFolderStore/FileStore';
 import Sidebar from './SideBar';
+import { Lesson } from '../../Modles/File'; // הוספת import של Lesson
 
 const MainT = () => {
   const theme = useTheme();
-  const [selectedRecording, setSelectedRecording] = useState<any | null>(null);
+  const location = useLocation(); // שימוש ב-useLocation
+  const [selectedRecording, setSelectedRecording] = useState<Lesson | null>(null);
   
   const storedUser = sessionStorage.getItem('User');
   const user = storedUser ? JSON.parse(storedUser) : null;
@@ -20,13 +24,27 @@ const MainT = () => {
     if (user?.id) {
       dispatch(fetchUserFiles(user.id));
     }
-  }, [dispatch, user?.id,selectedRecording]);
-  
-  const handleRecordingSelect = (recording: any) => {
-  console.log("handleRecordingSelect",recording);
-  setSelectedRecording(recording);
-  console.log("handleRecordingSelect",recording);
+  }, [dispatch, user?.id]);
 
+  // useEffect חדש לטיפול בשיעור שנבחר מ-navigation state
+  useEffect(() => {
+    const state = location.state as { selectedRecording?: any } | null;
+    if (state?.selectedRecording && allUserFiles.length > 0) {
+      // חיפוש השיעור במערך allUserFiles לפי ID
+      const foundRecording = allUserFiles.find(
+        (file: Lesson) => file.id === state.selectedRecording.id
+      );
+      if (foundRecording) {
+        setSelectedRecording(foundRecording);
+        console.log("Selected recording from navigation:", foundRecording);
+      }
+    }
+  }, [location.state, allUserFiles]);
+  
+  const handleRecordingSelect = (recording: Lesson) => {
+    console.log("handleRecordingSelect", recording);
+    setSelectedRecording(recording);
+    console.log("handleRecordingSelect", recording);
   };
 
   return (
@@ -66,8 +84,6 @@ const MainT = () => {
           overflow: 'hidden'
         }}
       >
-        {/* הסרת הכותרת העליונה */}
-
         <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1, overflow: 'auto' }}>
           <Paper 
             elevation={3} 
@@ -82,7 +98,7 @@ const MainT = () => {
             {selectedRecording ? (
               <Box sx={{ mb: 2, p: 2, bgcolor: 'rgba(0, 0, 0, 0.03)', borderRadius: 1 }}>
                 <Typography variant="subtitle1" fontWeight="medium">
-<strong>{selectedRecording.urlName?.split('.').slice(0, -1).join('.')}</strong>
+                  <strong>{selectedRecording.urlName?.split('.').slice(0, -1).join('.')}</strong>
                 </Typography>
               </Box>
             ) : (

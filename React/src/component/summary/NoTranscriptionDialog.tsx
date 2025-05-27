@@ -1,25 +1,31 @@
-
-
-
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Button, 
-  Typography,
-  Box,
-  Alert,
-  AlertTitle
+import {  Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography,Box,
+  Alert,AlertTitle
 } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { useNavigate } from "react-router-dom";
+import { Lesson } from "../../Modles/File";
 
 interface Props {
   open: boolean;
   onClose: () => void;
+  selectedLesson?: Lesson | null; // הוספת המידע על השיעור הנבחר
 }
 
-const NoTranscriptDialog: React.FC<Props> = ({ open, onClose }) => (
+const NoTranscriptDialog: React.FC<Props> = ({ open, onClose, selectedLesson }) => {
+  const navigate = useNavigate();
+
+  const handleNavigateToTranscript = () => {
+    onClose(); // סוגר את הדיאלוג
+    
+    // העברת מידע על השיעור הנבחר דרך state
+    navigate('/transcription', { 
+      state: { 
+        selectedRecording: selectedLesson 
+      } 
+    });
+  };
+
+  return (
   <Dialog 
     open={open} 
     onClose={onClose}
@@ -46,17 +52,26 @@ const NoTranscriptDialog: React.FC<Props> = ({ open, onClose }) => (
         צור קשר עם מנהל המערכת אם אתה מאמין שזו שגיאה.
       </Typography>
     </DialogContent>
-    <DialogActions sx={{ p: 2, pt: 0 }}>
+    <DialogActions sx={{ p: 2, pt: 0, gap: 1 }}>
       <Button 
         onClick={onClose} 
-        variant="contained"
+        variant="outlined"
         color="primary"
         sx={{ borderRadius: 2 }}
       >
         הבנתי
       </Button>
+      <Button 
+        onClick={handleNavigateToTranscript} 
+        variant="contained"
+        color="primary"
+        sx={{ borderRadius: 2 }}
+      >
+        מעבר לעמוד התמלול
+      </Button>
     </DialogActions>
   </Dialog>
-);
+  );
+};
 
 export default NoTranscriptDialog;

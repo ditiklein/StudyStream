@@ -14,7 +14,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { AppDispatch } from '../FileAndFolderStore/FileStore';
 import { deleteFile } from '../FileAndFolderStore/FilesSlice';
-import TransferFileDialog from '../FolderListDialog';
+import TransferFileDialog from './FolderListDialog';
 import { Lesson } from '../../Modles/File';
 
 const ITEM_HEIGHT = 48;

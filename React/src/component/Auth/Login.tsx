@@ -1,13 +1,14 @@
 import  { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {  Box, Button,  TextField,  Typography,  Container,  CircularProgress, Paper, Grid,InputAdornment, FormHelperText, Link
+import {  Box, Button,  TextField,  Typography,  Container,  CircularProgress, Paper, Grid,InputAdornment, FormHelperText, Link, IconButton
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-import { AppDispatch, Rootstore } from '../component/FileAndFolderStore/FileStore';
-import { login } from '../component/FileAndFolderStore/authSlice';
+import { AppDispatch, Rootstore } from '../FileAndFolderStore/FileStore';
+import { login } from '../FileAndFolderStore/authSlice';
 import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 // Custom styled components
 const primaryColor = '#001F4D'; // צבע כחול כהה
@@ -53,6 +54,12 @@ const Login = () => {
   });
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false); // מצב הצגת הסיסמה
+
+  // פונקציה להחלפת מצב הצגת הסיסמה
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   // פונקציה לחילוץ מסר השגיאה - זהה לזו שברג'יסטר
   const getErrorMessage = (error: any): string => {
@@ -192,7 +199,7 @@ const Login = () => {
                   <StyledTextField 
                     fullWidth  
                     name="password" 
-                    type="password"  
+                    type={showPassword ? 'text' : 'password'}  // החלפת סוג הקלט בהתאם למצב
                     placeholder="סיסמה*"  
                     variant="outlined" 
                     margin="normal"  
@@ -202,7 +209,13 @@ const Login = () => {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <LockIcon sx={{ color: 'white' }} />
+                          <IconButton
+                            onClick={handleTogglePasswordVisibility}
+                            edge="start"
+                            sx={{ color: 'white' }}
+                          >
+                            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                          </IconButton>
                         </InputAdornment>
                       ),
                     }}

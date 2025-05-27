@@ -12,7 +12,8 @@ import ListItemText from '@mui/material/ListItemText';
 import { deleteFolder } from '../FileAndFolderStore/FilesSlice';
 import { AppDispatch } from '../FileAndFolderStore/FileStore';
 import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove'; // אייקון של העברה
-import TransferFileDialog from '../FolderListDialog';
+import TransferFileDialog from './FolderListDialog';
+import DownloadIcon from '@mui/icons-material/Download';
 
 const ITEM_HEIGHT = 48;
 
@@ -50,6 +51,10 @@ export default function LongMenu({ id, onEdit,folder,currentFolder}: LongMenuPro
     dispatch(deleteFolder(id));
     handleClose();
   };
+const handleDownloadZip = (event: React.MouseEvent) => {
+  event.stopPropagation();
+  handleClose();
+};
 
   const handleEdit = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -88,16 +93,21 @@ export default function LongMenu({ id, onEdit,folder,currentFolder}: LongMenuPro
       >
         <MenuItem onClick={handleEdit}>
           <ListItemIcon><EditIcon /></ListItemIcon>
-          <ListItemText>Edit</ListItemText>
+          <ListItemText>עריכה</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleDelete}>
           <ListItemIcon><DeleteIcon /></ListItemIcon>
-          <ListItemText>Delete</ListItemText>
+          <ListItemText>מחיקה</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleMove}> {/* עדכון כאן */}
           <ListItemIcon><DriveFileMoveIcon /></ListItemIcon>
-          <ListItemText>Move</ListItemText>
+          <ListItemText>העברה</ListItemText>
         </MenuItem>
+        <MenuItem onClick={handleDownloadZip}>
+  <ListItemIcon><DownloadIcon /></ListItemIcon>
+  <ListItemText>הורדה כקובץ ZIP</ListItemText>
+</MenuItem>
+
       </Menu>
       <TransferFileDialog open={openTransferDialog} onClose={() => setOpenTransferDialog(false)} folder={folder} file={null} currentFolder={currentFolder}/>
 
