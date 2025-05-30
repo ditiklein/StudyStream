@@ -9,8 +9,13 @@ interface DemoStepProps {
 
 export const DemoStep: React.FC<DemoStepProps> = ({ number, title, description }) => {
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-      <Avatar
+    <Box sx={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      mb: 3,
+      direction: 'ltr',
+    }}>
+   <Avatar
         sx={{
           bgcolor: 'primary.main',
           color: 'white',
@@ -24,18 +29,26 @@ export const DemoStep: React.FC<DemoStepProps> = ({ number, title, description }
         {number}
       </Avatar>
       <Box sx={{ 
-        flexGrow: 1, 
-        textAlign: 'left',
-        '& > *': {
-          textAlign: 'right',
-          display: 'block',
-          width: '100%'
-        }
+        flexGrow: 1,
+        textAlign: 'left'
       }}>
-        <Typography variant="h4" component="h4" gutterBottom>
+        <Typography 
+          variant="h4" 
+          component="h4" 
+          gutterBottom
+          sx={{
+            textAlign: 'left',
+          }}
+        >
           {title}
         </Typography>
-        <Typography variant="body1" color="text.primary">
+        <Typography 
+          variant="body1" 
+          color="text.primary"
+          sx={{
+            textAlign: 'left',
+          }}
+        >
           {description}
         </Typography>
       </Box>
@@ -65,4 +78,3 @@ export const DEMO_STEPS = [
     description: 'המערכת מציעה לך אוטומטית תיקיות ותגיות מתאימות לחומר.'
   }
 ] as const;
-

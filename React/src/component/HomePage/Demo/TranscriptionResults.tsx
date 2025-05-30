@@ -83,7 +83,7 @@ export const TranscriptionResults: React.FC<TranscriptionResultsProps> = ({
         </Typography>
         
         {summary && (
-          <Accordion defaultExpanded sx={ACCORDION_STYLES}>
+          <Accordion sx={ACCORDION_STYLES}>
             <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}>
               <Typography variant="h6">סיכום</Typography>
             </AccordionSummary>
@@ -96,7 +96,7 @@ export const TranscriptionResults: React.FC<TranscriptionResultsProps> = ({
         )}
         
         {keyPoints && (
-          <Accordion defaultExpanded sx={ACCORDION_STYLES}>
+          <Accordion sx={ACCORDION_STYLES}>
             <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}>
               <Typography variant="h6">נקודות מפתח</Typography>
             </AccordionSummary>
