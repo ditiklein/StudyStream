@@ -21,7 +21,7 @@ type NameAvatarProps = {
 };
 
 const GradientAvatar = styled(Avatar)(() => ({
-  background: 'linear-gradient(to right, #ed4b9e, #8e2de2, #4a00e0)',
+  background: 'linear-gradient(to right, #1976D2, #1565C0, #e91e63)',
   color: 'white',
   backgroundSize: '200% 100%',
   animation: 'gradientShift 3s ease infinite',

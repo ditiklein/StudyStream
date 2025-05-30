@@ -28,6 +28,72 @@ const fetchData = async (urls: string[]) => {
   const results = await Promise.allSettled(urls.map(url => api.get(url)));
   return results.map(result => result.status === "fulfilled" ? result.value.data : []);
 };
+export const downloadFolderAsZip = createAsyncThunk(
+  "folders/downloadFolderAsZip",
+  async ({ folderId, folderName }: { folderId: number; folderName?: string }, thunkAPI) => {
+    try {
+      console.log(`🔄 מתחיל הורדת תיקייה ${folderId} כ-ZIP...`);
+      
+      // קריאה לשרת עם responseType blob
+      const response = await api.get(`/upload/download-folder-zip/${folderId}`, {
+        responseType: 'blob',
+        timeout: 300000, // 5 דקות timeout עבור קבצים גדולים
+      });
+      
+      console.log(`✅ קובץ ZIP נוצר בהצלחה, גודל: ${response.data.size} bytes`);
+      
+      // יצירת Blob מהתגובה
+      const blob = new Blob([response.data], { type: 'application/zip' });
+      const url = window.URL.createObjectURL(blob);
+      
+      // יצירת שם קובץ
+      const fileName = folderName ? `${folderName}.zip` : `folder_${folderId}.zip`;
+      
+      // יצירת לינק להורדה אוטומטית
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      link.style.display = 'none';
+      
+      // הוספה למסמך, לחיצה והסרה
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // ניקוי ה-URL לחיסכון בזיכרון
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 1000);
+      
+      console.log(`📥 הורדת ${fileName} החלה...`);
+      
+      return { 
+        success: true, 
+        fileName,
+        folderId 
+      };
+      
+    } catch (error) {
+      const err = error as AxiosError;
+      console.error(`❌ שגיאה בהורדת תיקייה ${folderId}:`, err);
+      
+      // הודעת שגיאה ידידותית למשתמש
+      let errorMessage = "שגיאה בהורדת התיקייה";
+      
+      if (err.code === 'ECONNABORTED') {
+        errorMessage = "הורדת התיקייה נכשלה - חסום זמן. נסה שוב מאוחר יותר.";
+      } else if (err.response?.status === 404) {
+        errorMessage = "התיקייה לא נמצאה";
+      } else if (err.response?.status === 403) {
+        errorMessage = "אין הרשאה להוריד תיקייה זו";
+      } else if (err.response?.status === 500) {
+        errorMessage = "שגיאת שרת בעת יצירת קובץ ה-ZIP";
+      }
+      
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
 
 // Async Thunks
 export const fetchUserFolders = createAsyncThunk(
@@ -260,6 +326,22 @@ const FilesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+          .addCase(downloadFolderAsZip.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        console.log("🔄 מתחיל תהליך הורדת ZIP...");
+      })
+      .addCase(downloadFolderAsZip.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log(`✅ הורדת ZIP הושלמה: ${action.payload.fileName}`);
+        // אפשר להוסיף notification או הודעת הצלחה כאן
+      })
+      .addCase(downloadFolderAsZip.rejected, (state, action) => {
+        state.loading = false;
+        state.error = typeof action.payload === "string" ? action.payload : "Failed to download folder as ZIP";
+        console.error(`❌ הורדת ZIP נכשלה: ${state.error}`);
+      })
+
       // fetchRootFolders
       .addCase(fetchRootFolders.pending, (state) => {
         state.loading = true;
