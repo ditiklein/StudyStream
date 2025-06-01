@@ -8,7 +8,6 @@ import { AppDispatch } from '../FileAndFolderStore/FileStore';
 import { updateUser } from '../FileAndFolderStore/authSlice';
 import PersonIcon from '@mui/icons-material/Person';
 import CloseIcon from '@mui/icons-material/Close';
-import EmailIcon from '@mui/icons-material/Email';
 import SaveIcon from '@mui/icons-material/Save';
 
 interface UserEditDialogProps {
@@ -20,7 +19,6 @@ interface UserEditDialogProps {
 export const UserEditDialog: React.FC<UserEditDialogProps> = ({ open, onClose, user }) => {
   const [firstName, setFirstName] = useState(user?.firstName || '');
   const [lastName, setlastName] = useState(user?.lastName || '');
-  const [email, setEmail] = useState(user?.email || '');
   const dispatch = useDispatch<AppDispatch>();
 
   const handleSave = () => {
@@ -29,7 +27,7 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({ open, onClose, u
     const updatedUser = {
       firstName,
       lastName,
-      email,
+      email:user.email,
       password: user.password,
     };
 
@@ -178,36 +176,7 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({ open, onClose, u
 
             <Divider sx={{ my: 1 }} />
 
-            <Box>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
-                פרטי התקשרות
-              </Typography>
-              <TextField
-                label="כתובת אימייל"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                fullWidth
-                variant="outlined"
-                type="email"
-                InputProps={{
-                  startAdornment: <EmailIcon sx={{ color: 'action.active', mr: 1 }} />,
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    transition: 'all 0.2s ease-in-out',
-                    '&:hover': {
-                      transform: 'translateY(-1px)',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    },
-                    '&.Mui-focused': {
-                      transform: 'translateY(-1px)',
-                      boxShadow: '0 4px 12px rgba(102, 126, 234, 0.25)',
-                    }
-                  }
-                }}
-              />
-            </Box>
+              
           </Stack>
         </Box>
       </DialogContent>

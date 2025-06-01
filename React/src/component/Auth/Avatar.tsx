@@ -13,7 +13,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EditIcon from '@mui/icons-material/Edit';
-import LogoutIcon from '@mui/icons-material/Logout';
 import { UserEditDialog } from './UserEditDialog';
 
 type NameAvatarProps = {
@@ -61,11 +60,7 @@ export const NameAvatar: React.FC<NameAvatarProps> = ({ name }) => {
     navigate(path);
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("User");
-    handleClose();
-    navigate('/login');
-  };
+ 
 
   const handleOpenEdit = () => {
     handleClose();
@@ -104,12 +99,7 @@ export const NameAvatar: React.FC<NameAvatarProps> = ({ name }) => {
           עריכת משתמש
         </MenuItem>
 
-        <MenuItem onClick={handleLogout}>
-          <ListItemIcon>
-            <LogoutIcon fontSize="small" />
-          </ListItemIcon>
-          התנתקות
-        </MenuItem>
+       
       </Menu>
 
       <UserEditDialog open={editOpen} onClose={() => setEditOpen(false)} user={user} />

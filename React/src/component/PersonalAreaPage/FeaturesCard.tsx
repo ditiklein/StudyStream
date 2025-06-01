@@ -69,7 +69,7 @@ const FeatureCards = () => {
       color: '#52c41a',
       onClick: () => {
         console.log('File sharing feature clicked');
-        // navigate('/share');
+         navigate('/share');
       }
     }
   ];

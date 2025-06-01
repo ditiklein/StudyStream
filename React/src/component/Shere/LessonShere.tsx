@@ -748,3 +748,53 @@
 // }
 
 // export default TeacherLessons
+import { Box, Typography, Container, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import HomeIcon from '@mui/icons-material/Home';
+
+const TeacherLessons = () => {
+  const navigate = useNavigate();
+
+  return (
+    <Container maxWidth="md">
+      <Box
+        sx={{
+          minHeight: '80vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
+          py: 4,
+        }}
+      >
+        {/* אייקון מרכזי */}
+        <Box sx={{ fontSize: 80, mb: 3 }}>🚧</Box>
+
+        <Typography variant="h2" sx={{ fontWeight: 'bold', color: '#1976D2', mb: 2 }}>
+          🚧 בשיפוצים 🚧
+        </Typography>
+
+        <Typography variant="h6" sx={{ color: '#666', mb: 1 }}>
+          אנחנו עובדים קשה כדי להביא לכם משהו מדהים!
+        </Typography>
+
+        <Typography variant="body1" sx={{ color: '#888', mb: 4, maxWidth: '600px' }}>
+          העמוד הזה בשלבי פיתוח ובקרוב יהיה זמין עם תכונות חדשות ומרגשות. תודה על הסבלנות! 💪
+        </Typography>
+
+        <Button
+          variant="contained"
+          size="large"
+          startIcon={<HomeIcon />}
+          onClick={() => navigate('/home')}
+          sx={{ borderRadius: '50px', px: 4 }}
+        >
+          חזרה לעמוד הבית
+        </Button>
+      </Box>
+    </Container>
+  );
+};
+
+export default TeacherLessons;
