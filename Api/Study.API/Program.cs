@@ -30,6 +30,7 @@ builder.Services.AddScoped<ITranscriptService, TranscriptService>();
 builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<IFolderService, FolderService>();
 builder.Services.AddScoped<IStatsticsService, StatsticsService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 
 // רישום שירותי Repository
 builder.Services.AddScoped<IRepository<User>, UserRepository>();
@@ -41,6 +42,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<IFolderRepository, FolderRepository>();
 builder.Services.AddScoped<ITranscriptRepository, TranscriptRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+
 
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();

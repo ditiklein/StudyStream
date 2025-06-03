@@ -14,6 +14,8 @@ namespace Study.API
             CreateMap<FolderPostModel, FolderDTO>().ReverseMap();
             CreateMap<TranscriptPostModel, TranscriptDTO>().ReverseMap();
             CreateMap<RegisterModel, UserDTO>().ReverseMap();
+            CreateMap<MessagePostModel, MessageDTO>().ReverseMap();
+
 
         }
 

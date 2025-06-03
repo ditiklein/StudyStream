@@ -20,6 +20,8 @@ namespace Study.Core
             CreateMap<Lesson, LessonDTO>().ReverseMap();
             CreateMap<Folder, FolderDTO>().ReverseMap();
             CreateMap<Transcript, TranscriptDTO>().ReverseMap();
+            CreateMap<Message, MessageDTO>().ReverseMap();
+
 
 
         }

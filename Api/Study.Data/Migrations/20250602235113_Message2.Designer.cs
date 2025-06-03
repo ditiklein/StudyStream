@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Study.Data;
 
@@ -10,9 +11,11 @@ using Study.Data;
 namespace Study.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250602235113_Message2")]
+    partial class Message2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,9 +48,6 @@ namespace Study.Data.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Subject")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("TicketNumber")
                         .HasColumnType("longtext");
 
                     b.Property<int?>("UserId")

@@ -4,6 +4,8 @@ import authSlice from "./authSlice";
 import transcriptReducer from "./TranscriptSlice";
  import keyPointsReducer from "./KeyPointsSlice";
 import uploadReducer from './UoloadSlice'; // הנתיב בהתאם למיקום הקובץ
+import messageReducer from './MessageSlice'; // הנתיב בהתאם למיקום הקובץ
+
 
 
 const store = configureStore({
@@ -13,6 +15,8 @@ const store = configureStore({
     transcript: transcriptReducer,
     keyPoints: keyPointsReducer,
    upload: uploadReducer,
+  messages: messageReducer,
+
 
  
   },

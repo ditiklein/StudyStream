@@ -20,6 +20,8 @@ namespace Study.Data
         public DbSet<UserRole> UserRoles { get; set; }
 
         public DbSet<SharedLesson> SharedLessons { get; set; }
+        public DbSet<Message> MessageList { get; set; }
+
 
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)

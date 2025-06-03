@@ -9,7 +9,7 @@ import TeacherLessons from './component/Shere/LessonShere'
 // import SharedLessonViewer from './component/Shere/LessonPage'
 import LessonsPage from './component/summary/LessonPage'
 import FileManager from './component/PersonalAreaPage/FileManager/FileManager'
-// import HelpSupportPage from './component/HelpSupportPage'
+import HelpSupportPage from './component/HelpSupportPage'
 
 export const Router = createBrowserRouter([
   {
@@ -17,7 +17,7 @@ export const Router = createBrowserRouter([
     element: <Layout></Layout>,
     children: [
       { path: "home", element:<Home></Home> },
-            // { path: "help", element:<HelpSupportPage></HelpSupportPage> },
+            { path: "help", element:<HelpSupportPage></HelpSupportPage> },
 
       { path: "personal", element: <FileManager></FileManager> },
      
