@@ -9,7 +9,7 @@ import TeacherLessons from './component/Shere/LessonShere'
 // import SharedLessonViewer from './component/Shere/LessonPage'
 import LessonsPage from './component/summary/LessonPage'
 import FileManager from './component/PersonalAreaPage/FileManager/FileManager'
-import HelpSupportPage from './component/HelpSupportPage'
+import HelpSupportPage from './component/Message/HelpSupportPage'
 
 export const Router = createBrowserRouter([
   {
